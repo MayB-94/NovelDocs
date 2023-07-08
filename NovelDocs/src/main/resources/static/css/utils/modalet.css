@@ -1,0 +1,174 @@
+@charset "UTF-8";
+
+div.modalet-background {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 15;
+	background-color: rgba(0, 0, 0, 0.5);
+	position: fixed;
+}
+
+div.modalet-background > div.modalet-modal {
+	position: relative;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: stretch;
+	max-width: 500px;
+	height: 75%;
+	background-color: white;
+	color: black;
+	font-size: 14px;
+	border-radius: 5px;
+}
+
+div.modalet-background > div.modalet-modal > * {
+	flex-shrink: 0;
+}
+div.modalet-background > div.modalet-modal > *:not(:first-child) {
+	margin-top: 10px;
+}
+
+div.modalet-background > div.modalet-modal > button.modalet-modal-close {
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	padding: 2px;
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	border: none;
+	outline: none;
+	background-color: transparent;
+	opacity: 0.5;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+div.modalet-background > div.modalet-modal > button.modalet-modal-close:hover {
+	opacity: 1.0;
+}
+div.modalet-background > div.modalet-modal > button.modalet-modal-close > * {
+	pointer-events: none;
+}
+div.modalet-background > div.modalet-modal > button.modalet-modal-close > svg {
+	width: 100%;
+	height: 100%;
+	fill: none;
+	stroke: black;
+	stroke-width: 64px;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+div.modalet-background > div.modalet-modal > button.modalet-modal-close > svg > path {
+	d: path('M 32 32 L 480 480 M 32 480 L 480 32');
+}
+
+div.modalet-background > div.modalet-modal > div.modalet-modal-container {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+	overflow: auto;
+	height: calc(100% - 100px);
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-container::-webkit-scrollbar {
+	width: 12px;
+	height: 12px;
+	background-color: transparent;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-container::-webkit-scrollbar-thumb {
+	width: 12px;
+	height: 12px;
+	background-clip: content-box;
+	background-color: rgba(0, 0, 0, 0.25);
+	border-radius: 6px;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-container::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(0, 0, 0, 0.5);
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-container::-webkit-scrollbar:horizontal {
+	border-bottom: 4px solid transparent;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-container::-webkit-scrollbar:vertical {
+	border-right: 4px solid transparent;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-container > div.modalet-modal-content > * {
+	max-width: 100%;
+}
+
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button {
+	padding: 5px 10px;
+	min-width: 50px;
+	height: 32px;
+	border: none;
+	outline: none;
+	background-color: white;
+	border-radius: 2.5px;
+	font-size: 14px;
+	font-weight: bold;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-shrink: 0;
+	cursor: pointer;
+}
+
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-OK {
+	border: 2px solid #C0C0C0;
+	background-color: white;
+	color: black;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-OK:hover {
+	border: 2px solid #A0A0A0;
+	background-color: #DFDFDF;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-YES {
+	border: 2px solid #C0C0C0;
+	background-color: white;
+	color: black;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-YES:hover {
+	border: 2px solid #A0A0A0;
+	background-color: #DFDFDF;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-NO {
+	border: 2px solid #A0A0A0;
+	background-color: #A0A0A0;
+	color: white;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-NO:hover {
+	border: 2px solid #C0C0C0;
+	background-color: #C0C0C0;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-CANCEL {
+	border: 2px solid #A0A0A0;
+	background-color: #A0A0A0;
+	color: white;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-CANCEL:hover {
+	border: 2px solid #C0C0C0;
+	background-color: #C0C0C0;
+}
+
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button:not(:first-child) {
+	margin-left: 10px;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button > span {
+	font-size: inherit;
+	font-weight: inherit;
+	color: inherit;
+}

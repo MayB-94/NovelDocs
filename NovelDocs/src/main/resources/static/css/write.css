@@ -1,0 +1,106 @@
+@charset "UTF-8";
+
+main {
+	position: relative;
+	display: flex;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+main > * {
+	flex-shrink: 0;
+}
+
+main > div.docs-editor {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+main > div.docs-editor > * {
+	flex-shrink: 0;
+}
+main > div.docs-editor > div.editor-header {
+	margin-bottom: 10px;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+main > div.docs-editor > div.editor-header > *:not(:first-child) {
+	margin-left: 10px;
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item > *:not(:first-child) {
+	margin-left: 5px;
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item > span.editor-header-label {
+	font-weight: bolder;
+	color: var(--subtheme);
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item > select.editor-header-select {
+	border: 2px solid var(--subtheme);
+	border-radius: 5px;
+	outline: none;
+	background-color: var(--theme);
+	font-weight: bolder;
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item > select.editor-header-select > option {
+	background-color: var(--theme);
+	font-weight: bolder;
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item.toggle-group {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item.toggle-group > button.toggle.editor-header-toggle {
+	width: 25px;
+	height: 25px;
+	border: 2px solid var(--subtheme);
+	border-left-width: 0;
+	background-color: var(--theme);
+	cursor: pointer;
+	margin-left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item.toggle-group > button.toggle.editor-header-toggle[data-toggle="false"]:hover {
+	background-color: rgba(var(--subtheme-rgb), 0.125);
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item.toggle-group > button.toggle.editor-header-toggle[data-toggle="true"] {
+	background-color: rgba(var(--subtheme-rgb), 0.25);
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item.toggle-group > button.toggle.editor-header-toggle:first-child {
+	width: 27px;
+	border-left-width: 2px;
+	border-radius: 5px 0 0 5px;
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item.toggle-group > button.toggle.editor-header-toggle:last-child {
+	border-radius: 0 5px 5px 0;
+}
+main > div.docs-editor > div.editor-header > div.editor-header-item.toggle-group > button.toggle.editor-header-toggle > span {
+	font-family: "Arial", sans-serif;
+}
+
+main > div.docs-editor > textarea.content {
+	min-width: 0;
+	box-sizing: border-box;
+	flex-grow: 1;
+	padding: 5px 10px;
+	border: 1px solid rgba(var(--theme-font-rgb), 0.125);
+	border-radius: 2.5px;
+	outline: none;
+	background-color: var(--theme);
+	color: var(--theme-font);
+}
+
+footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}

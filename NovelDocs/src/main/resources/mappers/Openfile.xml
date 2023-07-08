@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mayb.NovelDocs.model.OpenfileMapper">
+	<resultMap type="Openfile" id="OpenfileResultMap" autoMapping="true">
+		<id				column="docs_id"			property="docs.docs_id"/>
+		<id				column="reguser"			property="docs.reguser.id"/>
+		<id				column="opendate"		property="opendate"/>
+		<association		column="{docs_id=docs_id, reguser=reguser}"	property="docs"	select="getDocsById"/>
+		<collection		column="openuser"		property="openuser"	resultMap="com.mayb.NovelDocs.model.UserMapper.UserResultMap"/>
+	</resultMap>
+	<select id="getDocsById" parameterType="java.util.Map" resultMap="com.mayb.NovelDocs.model.DocsMapper.DocsResultMap">
+		SELECT D.*, U.*
+		FROM DOCS D LEFT OUTER JOIN "USER" U ON (D.REGUSER = U.ID)
+		WHERE D.DOCS_ID = #{docs_id} AND D.REGUSER = #{reguser}
+	</select>
+	<insert id="insertOpenfile" parameterType="Openfile">
+		INSERT INTO OPENFILE (DOCS_ID, REGUSER, OPENUSER)
+		VALUES(#{docs.docs_id}, #{docs.reguser.id}, #{openuser.id})
+	</insert>
+	<select id="getOpenfiles" parameterType="User" resultMap="OpenfileResultMap">
+		SELECT *
+		FROM (SELECT *
+				  FROM (SELECT DOCS_ID, REGUSER, OPENUSER, MAX(OPENDATE) OPENDATE
+				  			FROM OPENFILE
+				  			GROUP BY DOCS_ID, REGUSER, OPENUSER
+				  		   )
+				  WHERE OPENUSER = #{id}
+				  ORDER BY OPENDATE DESC)
+		WHERE ROWNUM BETWEEN 1 AND 5
+	</select>
+</mapper>

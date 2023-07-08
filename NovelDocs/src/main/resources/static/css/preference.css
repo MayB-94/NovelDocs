@@ -1,0 +1,120 @@
+@charset "UTF-8";
+/*@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);*/
+@import url('https://fonts.cdnfonts.com/css/pixeboy');
+
+:root, :root[color-theme='light'] {
+	--theme: #FFFFFF;
+	--theme-rgb: 255, 255, 255;
+	--theme-font: #333333;
+	--theme-font-rgb: 51, 51, 51;
+	--subtheme: #2368e8;
+	--subtheme-rgb: 35, 104, 232;
+	--subtheme-font: #FFFFFF;
+	--subtheme-font-rgb: 255, 255, 255;
+	--warning: #FF0000;
+	--warning-rgb: 255, 0, 0;
+	--confirm: #308830;
+	--confirm-rgb: 48, 136, 48;
+	--backtheme: #EEEEEE;
+	--backtheme-rgb: 238, 238, 238;
+}
+:root[color-theme='dark'] {
+	--theme: #333333;
+	--theme-rgb: 51, 51, 51;
+	--theme-font: #CCCCCC;
+	--theme-font-rgb: 204, 204, 204;
+	/*--subtheme: #2368e8;
+	--subtheme-rgb: 35, 104, 232;
+	--subtheme-font: #FFFFFF;
+	--subtheme-font-rgb: 255, 255, 255;*/
+	--subtheme: #CCCCCC;
+	--subtheme-rgb: 204, 204, 204;
+	--subtheme-font: #333333;
+	--subtheme-font-rgb: 51, 51, 51;
+	--warning: #FF0000;
+	--warning-rgb: 255, 0, 0;
+	--confirm: #308830;
+	--confirm-rgb: 48, 136, 48;
+	--backtheme: #111111;
+	--backtheme-rgb: 17, 17, 17;
+}
+
+/* Noto Sans KR (korean) http://www.google.com/fonts/earlyaccess */
+
+@font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 100;
+	src: url(/fonts/Noto_Sans_KR/NotoSansKR-Thin.woff2) format('woff2'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Thin.woff) format('woff'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Thin.otf) format('opentype');
+}
+@font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 300;
+	src: url(/fonts/Noto_Sans_KR/NotoSansKR-Light.woff2) format('woff2'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Light.woff) format('woff'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Light.otf) format('opentype');
+}
+@font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 400;
+	src: url(/fonts/Noto_Sans_KR/NotoSansKR-Regular.woff2) format('woff2'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Regular.woff) format('woff'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Regular.otf) format('opentype');
+}
+@font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 500;
+	src: url(/fonts/Noto_Sans_KR/NotoSansKR-Medium.woff2) format('woff2'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Medium.woff) format('woff'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Medium.otf) format('opentype');
+}
+@font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 700;
+	src: url(/fonts/Noto_Sans_KR/NotoSansKR-Bold.woff2) format('woff2'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Bold.woff) format('woff'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Bold.otf) format('opentype');
+}
+@font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 900;
+	src: url(/fonts/Noto_Sans_KR/NotoSansKR-Black.woff2) format('woff2'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Black.woff) format('woff'),
+	     url(/fonts/Noto_Sans_KR/NotoSansKR-Black.otf) format('opentype');
+}
+
+* {
+	font-family: "Noto Sans KR", sans-serif;
+	color: var(--theme-font);
+}
+
+a, a:link, a:visited, a:hover, a:active {
+	color: inherit;
+	text-decoration: none;
+}
+svg { stroke: var(--theme-font); }
+textarea { resize: none; }
+input, select {
+	background-color: transparent;
+}
+input:-webkit-autofill {
+	appearance: none !important;
+	background-color: transparent !important;
+    -webkit-box-shadow: 0 0 0 50px var(--theme) inset;
+    -webkit-text-fill-color: var(--theme-font);
+}
+body, main {
+	background-color: var(--theme);
+	color: var(--theme-font);
+}
+
+.pixeboy {
+	font-family: 'Pixeboy', sans-serif;
+}

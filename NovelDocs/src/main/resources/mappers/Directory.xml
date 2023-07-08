@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mayb.NovelDocs.model.DocsMapper">
+	<resultMap type="Directory" id="DirectoryResultMap" autoMapping="true">
+		<id		column="name"		property="name"/>
+		<id		column="parent"	property="parent"/>
+		<id		column="reguser"	property="reguser"/>
+		<result	column="regdate"	property="regdate"/>
+	</resultMap>
+	
+	<select id="getSubdirectory" parameterType="java.lang.String" resultMap="DirectoryResultMap">
+		SELECT *
+		FROM "DIRECTORY"
+		WHERE PARENT = #{currentPath}
+		ORDER BY NAME ASC
+	</select>
+</mapper>

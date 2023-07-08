@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mayb.NovelDocs.model.UserMapper">
+	<resultMap type="User" id="UserResultMap" autoMapping="true">
+		<id		column="id"					property="id"/>
+		<result	column="password"		property="password"/>
+		<result	column="nickname"		property="nickname"/>
+		<result	column="email"				property="email"/>
+		<result	column="user_regdate"	property="user_regdate"/>
+		<result	column="user_lastdate"	property="user_lastdate"/>
+		<result	column="user_role"		property="user_role"/>
+	</resultMap>
+	
+	<select id="getUserByUsername" parameterType="java.lang.String" resultMap="UserResultMap">
+		SELECT *
+		FROM "USER"
+		WHERE ID = #{username}
+	</select>
+	<select id="getUserByNickname" parameterType="java.lang.String" resultMap="UserResultMap">
+		SELECT *
+		FROM "USER"
+		WHERE NICKNAME = #{nickname}
+	</select>
+</mapper>

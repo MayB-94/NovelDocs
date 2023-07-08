@@ -1,0 +1,53 @@
+@charset "UTF-8";
+
+div.modalet-background > div.modalet-modal {
+	background-color: var(--theme);
+	color: var(--theme-font);
+}
+
+div.modalet-background > div.modalet-modal > button.modalet-modal-close > svg {
+	stroke: var(--theme-font);
+}
+
+div.modalet-background > div.modalet-modal > div.modalet-modal-container::-webkit-scrollbar-thumb {
+	background-color: rgba(var(--theme-font-rgb), 0.25);
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-container::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(var(--theme-font-rgb), 0.5);
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button {
+	background-color: var(--theme);
+}
+
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-OK {
+	background-color: var(--theme);
+	color: var(--theme-font);
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-OK:hover {
+	
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-YES {
+	background-color: var(--theme);
+	color: var(--theme-font);
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-YES:hover {
+	
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-NO {
+	border: 2px solid #A0A0A0;
+	background-color: #A0A0A0;
+	color: white;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-NO:hover {
+	border: 2px solid #C0C0C0;
+	background-color: #C0C0C0;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-CANCEL {
+	border: 2px solid #A0A0A0;
+	background-color: #A0A0A0;
+	color: white;
+}
+div.modalet-background > div.modalet-modal > div.modalet-modal-buttons > button.modalet-modal-buttons-CANCEL:hover {
+	border: 2px solid #C0C0C0;
+	background-color: #C0C0C0;
+}

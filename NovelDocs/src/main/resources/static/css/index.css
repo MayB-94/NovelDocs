@@ -1,0 +1,337 @@
+@charset "UTF-8";
+
+main {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+main > *:not(:first-child) {
+	margin-top: 10px;
+}
+main > div.recent-docs {
+	
+}
+main > div.recent-docs > div.content {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	flex-wrap: wrap;
+}
+main > div.recent-docs > div.content > div.recent-item {
+	width: calc(20% - 4px);
+	min-width: 120px;
+	height: 100px;
+	background-color: var(--theme);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: stretch;
+	border: 1px solid rgba(var(--subtheme-rgb), 0.5);
+	border-radius: 5px;
+	padding: 5px;
+	cursor: pointer;
+}
+main > div.recent-docs > div.content > div.recent-item:hover {
+	background-color: rgba(var(--subtheme-rgb), 0.125);
+}
+main > div.recent-docs > div.content > div.recent-item:not(:first-child) {
+	margin-left: 5px;
+}
+main > div.recent-docs > div.content > div.recent-item > * {
+	pointer-events: none;
+}
+main > div.recent-docs > div.content > div.recent-item > span.recent-item-title {
+	font-size: 16px;
+	font-weight: bolder;
+	color: var(--theme-font);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+main > div.recent-docs > div.content > div.recent-item > div.recent-item-path {
+	width: 100%;
+	overflow: hidden;
+}
+main > div.recent-docs > div.content > div.recent-item > div.recent-item-path > span {
+	font-size: 12px;
+	font-weight: bold;
+	color: rgba(var(--theme-font-rgb), 0.5);
+	white-space: nowrap;
+}
+main > div.recent-docs > div.content > div.recent-item > span.recent-item-reguser {
+	font-size: 12px;
+	font-weight: bold;
+	color: rgba(var(--subtheme-rgb), 0.75);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+main > div.recent-docs > div.content > div.recent-item > span.recent-item-opendate {
+	font-size: 12px;
+	font-weight: bold;
+	color: rgba(var(--theme-font-rgb), 0.5);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	align-self: flex-end;
+}
+
+main > div.docs-explorer {
+	margin-top: 25px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+main > div.recent-docs > div.header,
+main > div.docs-explorer > div.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+main > div.recent-docs > div.header > div.header-left,
+main > div.docs-explorer > div.header > div.header-left {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+main > div.recent-docs > div.header > div.header-left::before,
+main > div.docs-explorer > div.header > div.header-left::before {
+	content: "";
+	border-left: 5px solid var(--subtheme);
+	border-radius: 2.5px 0 0 2.5px;
+	align-self: stretch;
+	margin: 5px 0;
+	margin-right: 10px;
+}
+main > div.recent-docs > div.header > div.header-left > span.header-title,
+main > div.docs-explorer > div.header > div.header-left > span.header-title {
+	font-size: 20px;
+	font-weight: bolder;
+	color: var(--subtheme);
+}
+main > div.recent-docs > div.header > div.header-right,
+main > div.docs-explorer > div.header > div.header-right {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+main > div.docs-explorer > div.header > div.header-right > button.explorer-manipulate {
+	height: 30px;
+	padding: 5px 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 16px;
+	font-weight: bolder;
+	color: rgba(var(--subtheme-rgb), 0.75);
+	border: 1px solid rgba(var(--theme-font-rgb), 0.25);
+	border-radius: 5px;
+	outline: none;
+	background-color: var(--theme);
+	cursor: pointer;
+}
+main > div.docs-explorer > div.header > div.header-right > button.explorer-manipulate:hover {
+	background-color: rgba(var(--subtheme-rgb), 0.0625);
+}
+main > div.docs-explorer > div.header > div.header-right > button.explorer-manipulate > *:not(:first-child) {
+	margin-left: 5px;
+}
+main > div.docs-explorer > div.header > div.header-right > button.explorer-manipulate > span {
+	font-size: inherit;
+	font-weight: inherit;
+	color: inherit;
+	white-space: nowrap;
+}
+main > div.docs-explorer > div.explorer-path {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+main > div.docs-explorer > div.explorer-path::before {
+	content: "❯";
+	margin: 5px;
+	margin-right: 10px;
+	font-size: 16px;
+	font-weight: bolder;
+	color: rgba(var(--subtheme-rgb), 0.5);
+	position: sticky;
+}
+main > div.docs-explorer > div.explorer-path > span.explorer-path-item {
+	font-weight: bolder;
+	color: rgba(var(--theme-font-rgb), 0.5);
+	cursor: pointer;
+}
+main > div.docs-explorer > div.explorer-path > span.explorer-path-item:hover {
+	color: var(--theme-font);
+}
+main > div.docs-explorer > div.explorer-path > span.explorer-path-item:last-child {
+	color: var(--subtheme);
+	pointer-events: none;
+}
+main > div.docs-explorer > div.explorer-path > svg.separator {
+	width: 16px;
+	height: 16px;
+	fill: rgba(var(--theme-font-rgb), 0.5);
+}
+main > div.docs-explorer > div.explorer-path > svg.separator > path {
+	d: path("M 192 128 L 320 256 L 192 384 Z");
+}
+main > div.docs-explorer > div.content-header {
+	padding: 2.5px 0;
+	border-bottom: 2px solid rgba(var(--theme-font-rgb), 0.5);
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+main > div.docs-explorer > div.content-header > * {
+	font-size: 12px;
+	font-weight: bolder;
+	color: rgba(var(--theme-font-rgb), 0.5);
+	text-align: center;
+	flex-shrink: 0;
+}
+main > div.docs-explorer > div.content-header > *:first-child {
+	margin-left: 42px;
+	text-align: left;
+	flex-grow: 1;
+}
+main > div.docs-explorer > div.content-header > *:nth-child(2) {
+	width: 120px;
+}
+main > div.docs-explorer > div.content > div.explorer-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+main > div.docs-explorer > div.content {
+	position: relative;
+	border-bottom: 2px solid rgba(var(--theme-font-rgb), 0.5);
+}
+main > div.docs-explorer > div.content > div.explorer-item[data-selected="false"]:hover {
+	background-color: rgba(var(--subtheme-rgb), 0.125);
+}
+main > div.docs-explorer > div.content > div.explorer-item[data-selected="true"] {
+	background-color: rgba(var(--subtheme-rgb), 0.25);
+}
+main > div.docs-explorer > div.content > div.explorer-item:not(:last-child) {
+	border-bottom: 1px solid rgba(var(--theme-font-rgb), 0.5);
+}
+main > div.docs-explorer > div.content > div.explorer-item * {
+	pointer-events: none;
+	user-select: none;
+}
+main > div.docs-explorer > div.content > div.explorer-item > * {
+	flex-shrink: 0;
+}
+main > div.docs-explorer > div.content > div.explorer-item > div.explorer-item-left {
+	flex-grow: 1;
+}
+main > div.docs-explorer > div.content > div.explorer-item > div.explorer-item-left > *:not(:first-child) {
+	margin-left: 5px;
+}
+main > div.docs-explorer > div.content > div.explorer-item > div.explorer-item-left > svg {
+	width: 32px;
+	height: 32px;
+	stroke: var(--theme);
+	fill: var(--theme-font);
+}
+main > div.docs-explorer > div.content > div.explorer-item > div.explorer-item-left > svg > path {
+	stroke-width: 16px;
+	d: path("M 456 256 H 496 L 456 406 H 56 L 96 256 Z V 181 H 256 L 226 106 H 86 L 56 181 V 406 L 96 256 Z");
+}
+main > div.docs-explorer > div.content > div.explorer-item > div.explorer-item-left > svg > text {
+	font: bolder 256px sans-serif;
+	fill: rgba(var(--theme-font-rgb), 0.75);
+	stroke: transparent;
+}
+main > div.docs-explorer > div.content > div.explorer-item[data-type="super"] > div.explorer-item-left > svg > text {
+	fill: rgba(var(--subtheme-rgb), 0.75);
+}
+main > div.docs-explorer > div.content > div.explorer-item > div.explorer-item-left > span.explorer-item-title {
+	font-size: 16px;
+	font-weight: bolder;
+	color: var(--theme-font);
+}
+main > div.docs-explorer > div.content > div.explorer-item > div.explorer-item-right {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+main > div.docs-explorer > div.content > div.explorer-item > div.explorer-item-right > *:not(:first-child) {
+	margin-left: 5px;
+}
+main > div.docs-explorer > div.content > div.explorer-item > div.explorer-item-right > span.explorer-item-lastdate {
+	width: 120px;
+	text-align: center;
+	font-size: 14px;
+	font-weight: bolder;
+	color: rgba(var(--theme-font-rgb), 0.5);
+}
+
+main > div.docs-explorer > div.content > div.loading-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 10;
+}
+main > div.docs-explorer > div.content > div.loading-container > div.loading-content {
+	width: 100px;
+	height: 100px;
+	position: relative;
+}
+main > div.docs-explorer > div.content > div.loading-container > div.loading-content > svg[role="fast"] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	fill: white;
+	width: 100px;
+	height: 100px;
+	animation-duration: 0.75s;
+	animation-iteration-count: infinite;
+	animation-name: loadingRotation;
+	/* animation-timing-function: cubic-bezier(.33, 0, .66, 1); */
+	animation-timing-function: linear;
+}
+main > div.docs-explorer > div.content > div.loading-container > div.loading-content > svg[role="slow"] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	fill: var(--subtheme);
+	width: 100px;
+	height: 100px;
+	animation-duration: 0.75s;
+	animation-iteration-count: infinite;
+	animation-name: loadingRotationReverse;
+	/* animation-timing-function: cubic-bezier(.33, 0, .66, 1); */
+	animation-timing-function: linear;
+}
+main > div.docs-explorer > div.content > div.loading-container > div.loading-content > svg[role="fast"] > path {
+	d: path("M 256 64 A 192 192 0 0 0 120.235498 391.764502 L 142.862915 369.137085 A 160 160 0 0 1 256 96 Z");
+}
+main > div.docs-explorer > div.content > div.loading-container > div.loading-content > svg[role="slow"] > path {
+	d: path("M 256 32 A 224 224 0 0 0 97.608081 414.391919 L 120.235498 391.764502 A 192 192 0 0 1 256 64 Z");
+}
+@keyframes loadingRotation {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+@keyframes loadingRotationReverse {
+	0% {
+		transform: rotate(360deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}

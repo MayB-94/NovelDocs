@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mayb.NovelDocs.model.DocsMapper">
+	<resultMap type="Docs" id="DocsResultMap" autoMapping="true">
+		<id			column="title"			property="title"/>
+		<id			column="virtual_dir"	property="virtual_dir"/>
+		<id			column="reguser"		property="reguser.id"/>
+		<result		column="docs_id"		property="docs_id"/>
+		<result		column="content"		property="content"/>
+		<result		column="regdate"		property="regdate"/>
+		<result		column="lastdate"		property="lastdate"/>
+		<result		column="isdelete"		property="isdelete"/>
+		<result		column="deletedate"	property="deletedate"/>
+		<result		column="exposetype"	property="exposetype"/>
+		<collection	column="reguser"		property="reguser"	resultMap="com.mayb.NovelDocs.model.UserMapper.UserResultMap"/>
+	</resultMap>
+	
+	<select id="getDocs" parameterType="java.lang.String" resultMap="DocsResultMap">
+		SELECT D.*, U.*
+		FROM DOCS D LEFT OUTER JOIN "USER" U ON (D.REGUSER = U.ID)
+		WHERE D.VIRTUAL_DIR = #{currentPath} AND D.ISDELETE = 'N'
+		ORDER BY D.TITLE ASC
+	</select>
+	<select id="getDoc" parameterType="Docs" resultMap="DocsResultMap">
+		SELECT D.*, U.*
+		FROM DOCS D LEFT OUTER JOIN "USER" U ON (D.REGUSER = U.ID)
+		WHERE D.DOCS_ID = #{docs_id} AND D.REGUSER = #{reguser.id} AND D.ISDELETE = 'N'
+	</select>
+	<select id="getDocByPath" parameterType="Docs" resultMap="DocsResultMap">
+		SELECT D.*, U.*
+		FROM DOCS D LEFT OUTER JOIN "USER" U ON (D.REGUSER = U.ID)
+		WHERE D.VIRTUAL_DIR = #{virtual_dir} AND D.TITLE = #{title} AND D.REGUSER = #{reguser.id} AND D.ISDELETE = 'N'
+	</select>
+</mapper>

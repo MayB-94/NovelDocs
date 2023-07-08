@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.mayb.NovelDocs.model.User" alias="User"/>
+		<typeAlias type="com.mayb.NovelDocs.model.Directory" alias="Directory"/>
+		<typeAlias type="com.mayb.NovelDocs.model.Docs" alias="Docs"/>
+		<typeAlias type="com.mayb.NovelDocs.model.Openfile" alias="Openfile"/>
+		<typeAlias type="com.mayb.NovelDocs.model.Updatefile" alias="Updatefile"/>
+		<typeAlias type="com.mayb.NovelDocs.model.History" alias="History"/>
+	</typeAliases>
+</configuration>

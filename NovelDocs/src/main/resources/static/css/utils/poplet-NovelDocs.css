@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+div#poplet-container > div.poplet-box {
+	color: var(--theme-font);
+}
+div#poplet-container > div.poplet-box > button.poplet-close > svg {
+	stroke: var(--theme-font);
+}
