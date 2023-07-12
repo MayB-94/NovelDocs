@@ -16,8 +16,8 @@ public class DocsDaoImpl implements DocsDao {
 	private final SqlSession session;
 	
 	@Override
-	public List<Docs> getDocs(String currentPath) {
-		return session.selectList("getDocs", currentPath);
+	public List<Docs> getDocs(Docs searcher) {
+		return session.selectList("getDocs", searcher);
 	}
 	@Override
 	public Docs getDoc(Docs searcher) {
@@ -26,5 +26,10 @@ public class DocsDaoImpl implements DocsDao {
 	@Override
 	public Docs getDocByPath(Docs searcher) {
 		return session.selectOne("getDocByPath", searcher);
+	}
+	@Override
+	public Integer createDoc(Docs doc) {
+		try { return session.insert("createDoc", doc); }
+		catch (Exception e) { return 0; }
 	}
 }

@@ -9,10 +9,20 @@
 		<result	column="regdate"	property="regdate"/>
 	</resultMap>
 	
-	<select id="getSubdirectory" parameterType="java.lang.String" resultMap="DirectoryResultMap">
+	<select id="getSubdirectory" parameterType="Directory" resultMap="DirectoryResultMap">
 		SELECT *
 		FROM "DIRECTORY"
-		WHERE PARENT = #{currentPath}
+		WHERE PARENT = #{parent} AND REGUSER = #{reguser}
 		ORDER BY NAME ASC
+	</select>
+	<insert id="createSubdirectory" parameterType="Directory">
+		INSERT INTO DIRECTORY (NAME, PARENT, REGUSER)
+		VALUES (#{name}, #{parent}, #{reguser})
+	</insert>
+	<select id="getConnectedDirectories" parameterType="Directory" resultMap="DirectoryResultMap">
+		SELECT * FROM "DIRECTORY"
+		WHERE REGUSER = #{reguser}
+		START WITH PARENT = #{parent}
+		CONNECT BY PRIOR (PARENT || NAME) = PARENT
 	</select>
 </mapper>

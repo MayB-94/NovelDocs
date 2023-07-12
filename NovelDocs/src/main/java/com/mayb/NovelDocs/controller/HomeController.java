@@ -27,8 +27,14 @@ public class HomeController {
 	
 	@RequestMapping(value = "/")
 	public String index(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
-		List<Directory> subdirectories = directoryService.getSubdirectory("/");
-		List<Docs> docs = docsService.getDocs("/");
+		Directory searcher = new Directory();
+		searcher.setParent("/");
+		searcher.setReguser(userDetails.getUser().getId());
+		Docs searcherDocs = new Docs();
+		searcherDocs.setVirtual_dir("/");
+		searcherDocs.setReguser(userDetails.getUser());
+		List<Directory> subdirectories = directoryService.getSubdirectory(searcher);
+		List<Docs> docs = docsService.getDocs(searcherDocs);
 		List<Openfile> openfiles = openfileService.getOpenfiles(userDetails.getUser());
 		model.addAttribute("subdirectories", subdirectories);
 		model.addAttribute("docs", docs);

@@ -1,11 +1,35 @@
 package com.mayb.NovelDocs.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,11 +55,17 @@ public class AjaxController {
 	
 	@ResponseBody
 	@PostMapping(value = "/getDirectoryInfo")
-	public Map<String, Object> getDirectoryInfo(@RequestBody Map<String, Object> data) {
+	public Map<String, Object> getDirectoryInfo(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody Map<String, Object> data) {
 		Map<String, Object> result = new HashMap<>();
 		String currentPath = (String)data.get("path");
-		List<Directory> subdirectory = directoryService.getSubdirectory(currentPath);
-		List<Docs> doc = docsService.getDocs(currentPath);
+		Directory searcher = new Directory();
+		searcher.setParent(currentPath);
+		searcher.setReguser(userDetails.getUser().getId());
+		List<Directory> subdirectory = directoryService.getSubdirectory(searcher);
+		Docs searcherDocs = new Docs();
+		searcherDocs.setVirtual_dir(currentPath);
+		searcherDocs.setReguser(userDetails.getUser());
+		List<Docs> doc = docsService.getDocs(searcherDocs);
 		result.put("subdirectories", subdirectory);
 		result.put("docs", doc);
 		return result;
@@ -58,5 +88,184 @@ public class AjaxController {
 			result.put("writer", doc.getReguser().getNickname());
 		}
 		return result;
+	}
+	@ResponseBody
+	@PostMapping(value = "/createDoc")
+	public Map<String, Object> createDoc(@AuthenticationPrincipal UserDetailsImpl userDetails,
+													 @RequestBody Map<String, Object> data) {
+		Map<String, Object> result = new HashMap<>();
+		
+		String docTitle = (String)data.get("doc-title");
+		String docDir = (String)data.get("doc-dir");
+		String exposetype = (String)data.get("exposetype");
+		Docs doc = new Docs();
+		doc.setTitle(docTitle);
+		doc.setVirtual_dir(docDir);
+		doc.setReguser(userDetails.getUser());
+		doc.setExposetype(exposetype);
+		Integer queryResult = 0;
+		queryResult = docsService.createDoc(doc);
+		
+		result.put("result", queryResult);
+		return result;
+	}
+	@ResponseBody
+	@PostMapping(value = "/createSubdirectory")
+	public Map<String, Object> createSubdirectory(@AuthenticationPrincipal UserDetailsImpl userDetails,
+																@RequestBody Map<String, Object> data) {
+		Map<String, Object> result = new HashMap<>();
+		
+		String directoryName = (String)data.get("directory-name");
+		String directoryParent = (String)data.get("directory-parent");
+		Directory directory = new Directory();
+		directory.setName(directoryName);
+		directory.setParent(directoryParent);
+		directory.setReguser(userDetails.getUser().getId());
+		Integer queryResult = 0;
+		queryResult = directoryService.createSubdirectory(directory);
+		
+		result.put("result", queryResult);
+		return result;
+	}
+	private void compress(File file, String filename, ZipOutputStream zipOut) throws IOException {
+		if (file.isHidden()) return;
+		if (file.isDirectory()) {
+			if (filename.endsWith("/")) {
+				zipOut.putNextEntry(new ZipEntry(filename));
+				zipOut.closeEntry();
+			} else {
+				zipOut.putNextEntry(new ZipEntry(filename + "/"));
+				zipOut.closeEntry();
+			}
+			File[] children = file.listFiles();
+			for (File child : children) compress(child, filename + "/" + child.getName(), zipOut);
+			return;
+		}
+		FileInputStream fis = new FileInputStream(file);
+		ZipEntry zipEntry = new ZipEntry(filename);
+		zipOut.putNextEntry(zipEntry);
+		byte[] bytes = new byte[1024];
+		int length;
+		while ((length = fis.read(bytes)) >= 0) zipOut.write(bytes, 0, length);
+		fis.close();
+	}
+	@ResponseBody
+	@PostMapping(value = "/downloadDirectory")
+	public Map<String, Object> downloadDirectory(@AuthenticationPrincipal UserDetailsImpl userDetails,
+															    HttpServletRequest request, HttpServletResponse response,
+															    @RequestBody Map<String, Object> data) {
+		response.setCharacterEncoding("UTF-8");
+		Map<String, Object> result = new HashMap<>();
+		
+		String ancestor = (String)data.get("path");
+		Directory dirSearcher = new Directory();
+		dirSearcher.setParent(ancestor);
+		dirSearcher.setReguser(userDetails.getUser().getId());
+		Docs searcherDocs = new Docs();
+		searcherDocs.setVirtual_dir(ancestor);
+		searcherDocs.setReguser(userDetails.getUser());
+		List<Directory> subdirectories = directoryService.getConnectedDirectories(dirSearcher);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+		String lastDir = (ancestor.equals("/") ? "root" : ancestor).split("/")[(ancestor.equals("/") ? "root" : ancestor).split("/").length - 1];
+		String rootDir = String.format("%s_%s_%s", userDetails.getUser().getNickname(), (ancestor.equals("/") ? "root" : lastDir), sdf.format(new Date()));
+		File workDir = new File(request.getServletContext().getRealPath("/workbench") + File.separator + rootDir);
+		workDir.mkdir();
+		String realPath = request.getServletContext().getRealPath("/workbench/" + rootDir);
+		try {
+			List<Docs> rootDocs = docsService.getDocs(searcherDocs);
+			for (Docs doc : rootDocs) {
+				Path docPath = Paths.get((realPath + (doc.getVirtual_dir().equals("/") ? "" : "/" + doc.getVirtual_dir().substring(ancestor.length())) + "/" + doc.getTitle() + ".txt").replace("/", File.separator));
+				Files.writeString(docPath, doc.getContent() == null ? "" : doc.getContent(), StandardCharsets.UTF_8);
+			}
+			for (Directory dir : subdirectories) {
+				String dirPath = realPath + (dir.getParent().equals("/") ? "" : "/" + dir.getParent().substring(ancestor.length())).replace("/", File.separator) + File.separator + dir.getName();
+				File subdir = new File(dirPath);
+				if (!subdir.exists()) subdir.mkdir();
+				searcherDocs.setVirtual_dir((dir.getParent().equals("/") ? "" : dir.getParent()) + "/" + dir.getName());
+				List<Docs> docs = docsService.getDocs(searcherDocs);
+				for (Docs doc : docs) {
+					Path docPath = Paths.get((realPath + (doc.getVirtual_dir().equals("/") ? "" : "/" + doc.getVirtual_dir().substring(ancestor.length())) + "/" + doc.getTitle() + ".txt").replace("/", File.separator));
+					Files.writeString(docPath, doc.getContent() == null ? "" : doc.getContent(), StandardCharsets.UTF_8);
+				}
+			}
+			// Zip file로 만들어서 byte[]로 변환 후, base64 Encoding
+			String source = workDir.getAbsolutePath();
+			FileOutputStream fos = new FileOutputStream(request.getServletContext().getRealPath("/workbench/") + rootDir + ".zip");
+			ZipOutputStream zipOut = new ZipOutputStream(fos, StandardCharsets.UTF_8);
+			File file = new File(source);
+			compress(file, file.getName(), zipOut);
+			zipOut.close();
+			fos.close();
+			// Zip file Download
+			byte[] fileByte = Files.readAllBytes(Paths.get(request.getServletContext().getRealPath("/workbench/") + rootDir + ".zip"));
+			result.put("data", new String(Base64.encodeBase64(fileByte)));
+			result.put("filename", rootDir + ".zip");
+			result.put("result", 1);
+			return result;
+		} catch (IOException e) {
+			e.printStackTrace();
+			result.put("result", 0);
+			return result;
+		} finally {
+			try {
+				if (Files.exists(Paths.get(realPath))) {
+					Files.walk(workDir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+				} else Files.deleteIfExists(Paths.get(realPath));
+				Files.deleteIfExists(Paths.get(request.getServletContext().getRealPath("/workbench/") + rootDir + ".zip"));
+			} catch (IOException e) { e.printStackTrace(); }
+		}
+	}
+	@ResponseBody
+	@PostMapping(value = "/downloadDocs")
+	public Map<String, Object> downloadDocs(@AuthenticationPrincipal UserDetailsImpl userDetails,
+															HttpServletRequest request, HttpServletResponse response,
+															@RequestBody Map<String, Object> data) {
+		response.setCharacterEncoding("UTF-8");
+		Map<String, Object> result = new HashMap<>();
+		
+		String ancestor = (String)data.get("path");
+		Docs searcherDocs = new Docs();
+		searcherDocs.setVirtual_dir(ancestor);
+		searcherDocs.setReguser(userDetails.getUser());
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+		String lastDir = (ancestor.equals("/") ? "root" : ancestor).split("/")[(ancestor.equals("/") ? "root" : ancestor).split("/").length - 1];
+		String rootDir = String.format("%s_%s_%s", userDetails.getUser().getNickname(), (ancestor.equals("/") ? "root" : lastDir), sdf.format(new Date()));
+		File workDir = new File(request.getServletContext().getRealPath("/workbench") + File.separator + rootDir);
+		workDir.mkdir();
+		String realPath = request.getServletContext().getRealPath("/workbench/" + rootDir);
+		try {
+			List<Docs> rootDocs = docsService.getDocs(searcherDocs);
+			for (Docs doc : rootDocs) {
+				Path docPath = Paths.get((realPath + (doc.getVirtual_dir().equals("/") ? "" : "/" + doc.getVirtual_dir().substring(ancestor.length())) + "/" + doc.getTitle() + ".txt").replace("/", File.separator));
+				Files.writeString(docPath, doc.getContent() == null ? "" : doc.getContent(), StandardCharsets.UTF_8);
+			}
+			// Zip file로 만들어서 byte[]로 변환 후, base64 Encoding
+			String source = workDir.getAbsolutePath();
+			FileOutputStream fos = new FileOutputStream(request.getServletContext().getRealPath("/workbench/") + rootDir + ".zip");
+			ZipOutputStream zipOut = new ZipOutputStream(fos, StandardCharsets.UTF_8);
+			File file = new File(source);
+			compress(file, file.getName(), zipOut);
+			zipOut.close();
+			fos.close();
+			// Zip file Download
+			byte[] fileByte = Files.readAllBytes(Paths.get(request.getServletContext().getRealPath("/workbench/") + rootDir + ".zip"));
+			result.put("data", new String(Base64.encodeBase64(fileByte)));
+			result.put("filename", rootDir + ".zip");
+			result.put("result", 1);
+			return result;
+		} catch (IOException e) {
+			e.printStackTrace();
+			result.put("result", 0);
+			return result;
+		} finally {
+			try {
+				if (Files.exists(Paths.get(realPath))) {
+					Files.walk(workDir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+				} else Files.deleteIfExists(Paths.get(realPath));
+				Files.deleteIfExists(Paths.get(request.getServletContext().getRealPath("/workbench/") + rootDir + ".zip"));
+			} catch (IOException e) { e.printStackTrace(); }
+		}
 	}
 }

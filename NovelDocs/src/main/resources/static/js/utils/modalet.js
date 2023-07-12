@@ -36,10 +36,10 @@ class Modalet {
 		if (!(!data.YES)) actions['YES'] = data.YES;
 		if (!(!data.NO)) actions['NO'] = data.NO;
 		
-		let okAction = actions != null && !(!actions.OK) ? actions.OK : () => {};
-		let yesAction = actions != null && !(!actions.YES) ? actions.YES : () => {};
-		let noAction = actions != null && !(!actions.NO) ? actions.NO : () => {};
-		let cancelAction = actions != null && !(!actions.CANCEL) ? actions.CANCEL : () => {};
+		let okAction = actions != null && !(!actions.OK) ? actions.OK : () => { return true; };
+		let yesAction = actions != null && !(!actions.YES) ? actions.YES : () => { return true; };
+		let noAction = actions != null && !(!actions.NO) ? actions.NO : () => { return false; };
+		let cancelAction = actions != null && !(!actions.CANCEL) ? actions.CANCEL : () => { return false; };
 		
 		let backPanel = $('<div></div>');
 		$(backPanel).attr('class', 'modalet-background');
@@ -102,14 +102,15 @@ class Modalet {
 			$(button).attr('class', className);
 			$(button).append($(buttonSpan));
 			$(button).click(e => {
+				let modalResponse = false;
 				switch (btn) {
-					case Modalet.ModalResult.OK: okAction(); break;
-					case Modalet.ModalResult.YES: yesAction(); break;
-					case Modalet.ModalResult.NO: noAction(); break;
-					case Modalet.ModalResult.CANCEL: cancelAction(); break;
+					case Modalet.ModalResult.OK: modalResponse = okAction(); break;
+					case Modalet.ModalResult.YES: modalResponse = yesAction(); break;
+					case Modalet.ModalResult.NO: modalResponse = noAction(); break;
+					case Modalet.ModalResult.CANCEL: modalResponse = cancelAction(); break;
 					default: break;
 				}
-				$(backPanel).remove();
+				if (modalResponse != null) $(backPanel).remove();
 			});
 			$(buttonSection).append($(button));
 		}

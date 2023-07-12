@@ -16,7 +16,15 @@ public class DirectoryServiceImpl implements DirectoryService {
 	private final DirectoryDao directoryDao;
 	
 	@Override
-	public List<Directory> getSubdirectory(String currentPath) {
-		return directoryDao.getSubdirectory(currentPath);
+	public List<Directory> getSubdirectory(Directory searcher) {
+		return directoryDao.getSubdirectory(searcher);
+	}
+	@Override
+	public Integer createSubdirectory(Directory directory) {
+		return directoryDao.createSubdirectory(directory);
+	}
+	@Override
+	public List<Directory> getConnectedDirectories(Directory searcher) {
+		return directoryDao.getConnectedDirectories(searcher);
 	}
 }

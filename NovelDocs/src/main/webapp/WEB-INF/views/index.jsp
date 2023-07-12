@@ -11,7 +11,7 @@
 	</div>
 	<div class="content">
 		<c:forEach var="openfile" items="${openfiles }">
-			<div class="recent-item">
+			<div class="recent-item" data-name="${openfile.docs.title }" data-path="${openfile.docs.virtual_dir }">
 				<span class="recent-item-title">${openfile.docs.title }</span>
 				<div class="recent-item-path">
 					<span>${openfile.docs.virtual_dir }</span>
@@ -28,8 +28,26 @@
 			<span class="header-title">탐색</span>
 		</div>
 		<div class="header-right">
-			<button type="button" class="explorer-manipulate explorer-new">
-				<span>새 문서</span>
+			<span style="font-size: 14px; font-weight: bolder; color: var(--subtheme);">다운로드</span>
+			<button type="button" class="explorer-manipulate explorer-file-download-all">
+				<svg>
+					<path d="M 256 480 L 64 304 H 192 V 128 H 352 V 304 H 448 Z M 192 32 H 352"/>
+					<text text-anchor="middle" x="256" y="384">ALL</text>
+					<text text-anchor="middle" x="256" y="384">ALL</text>
+				</svg>
+				<span>전체</span>
+			</button>
+			<button type="button" class="explorer-manipulate explorer-file-download">
+				<svg>
+					<path d="M 256 480 L 64 304 H 192 V 128 H 352 V 304 H 448 Z M 192 32 H 352"/>
+				</svg>
+				<span>현재 위치</span>
+			</button>
+			<button type="button" class="explorer-manipulate explorer-file-download-only-docs">
+				<svg>
+					<path d="M 256 480 L 64 304 H 192 V 128 H 352 V 304 H 448 Z M 192 32 H 352"/>
+				</svg>
+				<span>현재 위치 문서만</span>
 			</button>
 		</div>
 	</div>
@@ -38,7 +56,6 @@
 	</div>
 	<div class="content-header">
 		<span>이름</span>
-		<!-- <span>마지막으로 수정한 시각</span> -->
 		<span>마지막 수정 시각</span>
 	</div>
 	<div class="content">

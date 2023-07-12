@@ -116,26 +116,94 @@ const proxy = new Proxy(observe, {
 					}
 				}
 			});
+		} else {
+			observe[prop] = value;
 		}
 	}
 });
 
+$(document).on('mousedown', 'main', e => {
+	$('dialog.context-menu').remove();
+});
 
-$(document).on('click', 'main', e => {
-	let elem = $('main');
-	$(elem).find('div.docs-explorer > div.content > div.explorer-item').attr('data-selected', 'false');
+$(document).on('click', 'div.docs-explorer > div.content', e => {
+	let elem = $('div.docs-explorer > div.content');
+	$(elem).find('div.explorer-item').attr('data-selected', 'false');
 	proxy.lastSelected = null;
 });
 
 
 $(document).on('click', 'button.explorer-manipulate', e => {
-	e.stopPropagation();
+	
 });
 
 
-$(document).on('click', 'button.explorer-new', e => {
-	let elem = $(e.target).closest('button.explorer-new');
-	
+$(document).on('click', 'button.explorer-file-download-all', e => {
+	let elem = $(e.target).closest('button.explorer-file-download-all');
+	$.ajax({
+		url: getContext() + '/ajax/downloadDirectory',
+		type: 'post',
+		data: JSON.stringify({ path: '/' }),
+		contentType: 'application/json',
+		dataType: 'json',
+		success: data => {
+			if (data.result != 1) {
+				Poplet.pop('다운로드에 실패했습니다', Poplet.PopType.INVALID);
+				return;
+			}
+			Poplet.pop('다운로드를 시작합니다');
+			const link = document.createElement('a');
+			link.href = 'data:text/plain;base64,' + data.data;
+			link.download = data.filename;
+			link.click();
+		}
+	})
+});
+
+
+$(document).on('click', 'button.explorer-file-download', e => {
+	let elem = $(e.target).closest('button.explorer-file-download');
+	$.ajax({
+		url: getContext() + '/ajax/downloadDirectory',
+		type: 'post',
+		data: JSON.stringify({ path: proxy.explorePath }),
+		contentType: 'application/json',
+		dataType: 'json',
+		success: data => {
+			if (data.result != 1) {
+				Poplet.pop('다운로드에 실패했습니다', Poplet.PopType.INVALID);
+				return;
+			}
+			Poplet.pop('다운로드를 시작합니다');
+			const link = document.createElement('a');
+			link.href = 'data:text/plain;base64,' + data.data;
+			link.download = data.filename;
+			link.click();
+		}
+	})
+});
+
+
+$(document).on('click', 'button.explorer-file-download-only-docs', e => {
+	let elem = $(e.target).closest('button.explorer-file-download-only-docs');
+	$.ajax({
+		url: getContext() + '/ajax/downloadDocs',
+		type: 'post',
+		data: JSON.stringify({ path: proxy.explorePath }),
+		contentType: 'application/json',
+		dataType: 'json',
+		success: data => {
+			if (data.result != 1) {
+				Poplet.pop('다운로드에 실패했습니다', Poplet.PopType.INVALID);
+				return;
+			}
+			Poplet.pop('다운로드를 시작합니다');
+			const link = document.createElement('a');
+			link.href = 'data:text/plain;base64,' + data.data;
+			link.download = data.filename;
+			link.click();
+		}
+	})
 });
 
 $(document).on('click', 'span.explorer-path-item', e => {
@@ -146,6 +214,7 @@ $(document).on('click', 'span.explorer-path-item', e => {
 
 $(document).on('click', 'div.explorer-item', e => {
 	e.stopPropagation();
+	$('main').mousedown();
 	let elem = $(e.target).closest('div.explorer-item');
 	if (e.ctrlKey) {
 		$(elem).attr('data-selected', $(elem).attr('data-selected') == 'true' ? 'false' : 'true');
@@ -194,52 +263,220 @@ $(document).on('dblclick', 'div.explorer-item', e => {
 	}
 });
 
-const pathAnimation = element => {
-	
-};
-
-$(window).resize(e => {
+const pathAnimation = () => {
 	$('div.recent-docs').find('div.recent-item-path > span').css('display', '');
-	$('div.recent-docs').find('div.recent-item-path > span').css('transform', 'translateX(0)');
+	$('div.recent-docs').find('div.recent-item-path > span').css('left', '0');
 	$('div.recent-docs').find('div.recent-item-path > span').stop();
-	let getWidth = element => parseFloat($(element).css('width').replace('px', ''));
 	$('div.recent-docs').find('div.recent-item-path > span').each((index, item) => {
 		let elem = $(item);
 		let parent = $(elem).closest('div.recent-item-path');
+		let framerate = 12;
+		
+		let duration = 0;
 		let getWidth = element => parseFloat($(element).css('width').replace('px', ''));
-		$(elem).css({
-			'width': $(elem).css('width'),
-			'display': 'block'
-		});
+		
 		if (getWidth(elem) > getWidth(parent)) {
 			let diff = getWidth(elem) - getWidth(parent);
+			duration = diff / 0.02;
+			$(elem).css({
+				'width': $(elem).css('width'),
+				'display': 'block',
+				'left': '0'
+			});
 			const slide = (element, diff) => {
-				$(element).animate({ 'transform': `translateX(-${diff}px)` }, 5000, () => {
-					setInterval(slide(element, diff), 3000);
+				$(element).animate({ 'left': `-${diff}px` }, duration, 'linear', () => {
+					setTimeout(() => pathAnimation(), 2000);
 				});
 			};
-			slide(elem, diff);
+			setTimeout(() => slide(elem, diff), 1000);
+		}
+	});
+};
+
+$(document).on('resize', 'div.recent-item', e => {
+	pathAnimation();
+});
+
+$(document).on('dblclick', 'div.recent-item', e => {
+	let elem = $(e.target).closest('div.recent-item');
+	$.ajax({
+		url: getContext() + '/ajax/getDocInfo',
+		type: 'post',
+		data: JSON.stringify({ directory: $(elem).attr('data-path'), filename: $(elem).attr('data-name') }),
+		dataType: 'json',
+		contentType: 'application/json',
+		success: data => {
+			location.href = getContext() + `/docs/${data.writer}/${data.docs_id}`;
 		}
 	});
 });
 
-$(() => {
-	$('div.recent-docs').find('div.recent-item-path > span').each((index, item) => {
-		let elem = $(item);
-		let parent = $(elem).closest('div.recent-item-path');
-		let getWidth = element => parseFloat($(element).css('width').replace('px', ''));
-		$(elem).css({
-			'width': $(elem).css('width'),
-			'display': 'block'
-		});
-		if (getWidth(elem) > getWidth(parent)) {
-			let diff = getWidth(elem) - getWidth(parent);
-			const slide = (element, diff) => {
-				$(element).animate({ 'transform': `translateX(-${diff}px)` }, 5000, () => {
-					setInterval(slide(element, diff), 3000);
+$(document).on('contextmenu', 'div.docs-explorer > div.content', e => {
+	e.preventDefault();
+	let contextMenu = $('<dialog class="context-menu" data-header="explorer-content"></dialog>');
+	const contexts = [
+		{
+			role: 'superDir',
+			text: '상위 디렉토리',
+			d: 'M 448 384 H 128 V 128 L 64 192 L 128 128 L 192 192',
+			condition: proxy.explorePath != '/',
+			action: () => {
+				let path = proxy.explorePath.split('/');
+				let expPath = path.slice(0, path.length - 1);
+				proxy.explorePath = expPath.join('/') == '' ? '/' : expPath.join('/');
+			}
+		},
+		{
+			role: 'newDoc',
+			text: '새 문서',
+			d: 'M 181 32 V 181 H 32 V 331 H 181 V 480 H 331 V 331 H 480 V 181 H 331 V 32 Z',
+			action: () => {
+				Modalet.show({
+					title: '<h3 class="margin-0">새 문서 생성</h3>',
+					content: '<div class="display-flex flex-direction-column justify-content-flex-start align-items-stretch">' +
+							   '<div class="font-weight-bolder modalet-item-group">' +
+							   '<label class="margin-right-5px" for="doc-title">제목</label>' +
+							   '<input id="doc-title" class="flex-grow-1" name="doc-title" placeholder="문서 제목" size="0">' +
+							   '</div>' +
+							   '<div class="font-weight-bolder modalet-item-group">' +
+							   '<button type="button" class="toggle template-toggle" role="exposetype" data-toggle="false"></button>' +
+							   '</div>' +
+							   '</div>',
+					type: Modalet.ModalType.OKCANCEL,
+					OK: () => {
+						if (!$('div.modalet-modal').find('input#doc-title').val()) return null;
+						else {
+							let title = $('div.modalet-modal').find('input#doc-title').val();
+							let modalResponse = true;
+							$.ajax({
+								url: getContext() + '/ajax/createDoc',
+								type: 'post',
+								data: JSON.stringify({
+									'doc-title': $('div.modalet-modal').find('input#doc-title').val(),
+									'doc-dir': proxy.explorePath,
+									'exposetype': $('button.template-toggle[role="exposetype"]').attr('data-toggle') == 'false' ? 'private' : 'public'
+								}),
+								dataType: 'json',
+								contentType: 'application/json',
+								async: false,
+								success: data => {
+									if (data.result == 0) {
+										Poplet.pop('파일을 생성하지 못했습니다', Poplet.PopType.INVALID);
+										modalResponse = null;
+									}
+									else {
+										Poplet.pop('파일을 생성했습니다', Poplet.PopType.VALID);
+										proxy.explorePath = proxy.explorePath;
+										$.ajax({
+											url: getContext() + '/ajax/getDocInfo',
+											type: 'post',
+											data: JSON.stringify({ directory: proxy.explorePath, filename: title }),
+											dataType: 'json',
+											contentType: 'application/json',
+											success: data => {
+												location.href = getContext() + `/docs/${data.writer}/${data.docs_id}`;
+											}
+										});
+										modalResponse = true;
+									}
+								}
+							});
+							return modalResponse;
+						}
+					}
 				});
-			};
-			slide(elem, diff);
+			}
+		},
+		{
+			role: 'newDir',
+			text: '새 디렉토리',
+			d: 'M 181 32 V 181 H 32 V 331 H 181 V 480 H 331 V 331 H 480 V 181 H 331 V 32 Z',
+			svgClasses: [ 'fill-subtheme' ],
+			action: () => {
+				Modalet.show({
+					title: '<h3 class="margin-0">디렉토리 생성</h3>',
+					content: '<div class="display-flex flex-direction-column justify-content-flex-start align-items-stretch">' +
+							   '<div class="font-weight-bolder modalet-item-group">' +
+							   '<label class="margin-right-5px" for="directory-name">이름</label>' +
+							   '<input id="directory-name" name="directory-name" placeholder="디렉토리 이름">' +
+							   '</div>' +
+							   '</div>',
+					type: Modalet.ModalType.OKCANCEL,
+					OK: () => {
+						if (!$('div.modalet-modal').find('input#directory-name').val()) return null;
+						else {
+							let modalResponse = true;
+							$.ajax({
+								url: getContext() + '/ajax/createSubdirectory',
+								type: 'post',
+								data: JSON.stringify({
+									'directory-name': $('div.modalet-modal').find('input#directory-name').val(),
+									'directory-parent': proxy.explorePath
+								}),
+								dataType: 'json',
+								contentType: 'application/json',
+								async: false,
+								success: data => {
+									if (data.result == 0) {
+										Poplet.pop('폴더를 생성하지 못했습니다', Poplet.PopType.INVALID);
+										modalResponse = null;
+									}
+									else {
+										Poplet.pop('폴더를 생성했습니다', Poplet.PopType.VALID);
+										proxy.explorePath = proxy.explorePath;
+										modalResponse = true;
+									}
+								}
+							});
+							return modalResponse;
+						}
+					}
+				});
+			}
+		},
+		//'separator'
+	];
+	for (let ct of contexts) {
+		if (ct === 'separator') {
+			let hr = $('<hr style="width: 90%;"/>');
+			$(contextMenu).append($(hr));
+			continue;
 		}
+		if (typeof ct.condition !== 'undefined') {
+			if (!ct.condition) continue;
+		}
+		let contextItem = $('<div class="context-menu-item"></div>');
+		let contextLeft = $('<div class="context-menu-item-left"></div>');
+		let contextRight = $('<div class="context-menu-item-right"></div>');
+		$(contextItem).attr('role', ct.role);
+		$(contextItem).prepend($(contextLeft));
+		$(contextItem).append($(contextRight));
+		let svg = document.createElementNS(svgNS, 'svg');
+		svg.classList.add('context-menu-item-logo');
+		if (typeof ct.svgClasses !== 'undefined') {
+			for (let cls of ct.svgClasses) svg.classList.add(cls);
+		}
+		svg.setAttribute('viewBox', '0 0 512 512');
+		let svgPath = document.createElementNS(svgNS, 'path');
+		if (ct.d != '') svgPath.setAttribute('d', ct.d);
+		$(svg).append($(svgPath));
+		$(contextLeft).append($(svg));
+		let span = $('<span class="context-menu-item-text"></span>');
+		$(span).text(ct.text);
+		$(contextLeft).append($(span));
+		$(contextItem).click(e => {
+			$(contextMenu).remove();
+			ct.action();
+		});
+		$(contextMenu).append($(contextItem));
+	}
+	$('body').append($(contextMenu));
+	$(contextMenu).css({
+		top: e.clientY - ($(window).height() < ($(contextMenu).height() + e.clientY) ? $(contextMenu).height() : 0),
+		left: e.clientX - ($(window).width() < ($(contextMenu).width() + e.clientX) ? $(contextMenu).width() : 0)
 	});
+});
+
+$(() => {
+	pathAnimation();
 });

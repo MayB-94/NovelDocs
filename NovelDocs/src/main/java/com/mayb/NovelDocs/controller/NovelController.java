@@ -34,11 +34,11 @@ public class NovelController {
 		searcher.setDocs_id(docs_id);
 		searcher.setReguser(user);
 		Docs docs = docsService.getDoc(searcher);
-		if (!docs.getExposetype().equals("public") && !userDetails.getUser().getId().equals(user.getId())) return "redirect:/";
+		if (!docs.getExposetype().equals("public") && (userDetails == null || !userDetails.getUser().getId().equals(user.getId()))) return "redirect:/";
 		else {
 			Openfile openfile = new Openfile();
 			openfile.setDocs(docs);
-			openfile.setOpenuser(userDetails.getUser());
+			openfile.setOpenuser(userDetails.getUser()); // 비로그인 접근 시 여기서 문제 발생
 			openfileService.insertOpenfile(openfile);
 		}
 		model.addAttribute("doc", docs);

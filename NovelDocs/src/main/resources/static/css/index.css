@@ -6,6 +6,9 @@ main {
 	justify-content: flex-start;
 	align-items: stretch;
 }
+main > * {
+	flex-shrink: 0;
+}
 main > *:not(:first-child) {
 	margin-top: 10px;
 }
@@ -54,6 +57,7 @@ main > div.recent-docs > div.content > div.recent-item > div.recent-item-path {
 	overflow: hidden;
 }
 main > div.recent-docs > div.content > div.recent-item > div.recent-item-path > span {
+	position: relative;
 	font-size: 12px;
 	font-weight: bold;
 	color: rgba(var(--theme-font-rgb), 0.5);
@@ -79,10 +83,14 @@ main > div.recent-docs > div.content > div.recent-item > span.recent-item-openda
 
 main > div.docs-explorer {
 	margin-top: 25px;
+	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: stretch;
+}
+main > div.docs-explorer > * {
+	flex-shrink: 0;
 }
 main > div.recent-docs > div.header,
 main > div.docs-explorer > div.header {
@@ -117,13 +125,16 @@ main > div.docs-explorer > div.header > div.header-right {
 	justify-content: flex-end;
 	align-items: center;
 }
+main > div.docs-explorer > div.header > div.header-right > *:not(:first-child) {
+	margin-left: 5px;
+}
 main > div.docs-explorer > div.header > div.header-right > button.explorer-manipulate {
 	height: 30px;
 	padding: 5px 10px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	font-size: 16px;
+	font-size: 13px;
 	font-weight: bolder;
 	color: rgba(var(--subtheme-rgb), 0.75);
 	border: 1px solid rgba(var(--theme-font-rgb), 0.25);
@@ -144,6 +155,34 @@ main > div.docs-explorer > div.header > div.header-right > button.explorer-manip
 	color: inherit;
 	white-space: nowrap;
 }
+main > div.docs-explorer > div.header > div.header-right > button.explorer-file-download-all > svg {
+	stroke: var(--subtheme);
+	fill: var(--subtheme);
+	stroke-width: 64px;
+}
+main > div.docs-explorer > div.header > div.header-right > button.explorer-file-download-all > svg > text {
+	font: bolder 256px "Noto Sans KR";
+}
+main > div.docs-explorer > div.header > div.header-right > button.explorer-file-download-all > svg > text:nth-child(2) {
+	fill: var(--theme);
+	stroke: var(--theme);
+	stroke-width: 64px;
+}
+main > div.docs-explorer > div.header > div.header-right > button.explorer-file-download-all > svg > text:nth-child(3) {
+	fill: var(--warning);
+	stroke: transparent;
+	stroke-width: 0;
+}
+main > div.docs-explorer > div.header > div.header-right > button.explorer-file-download > svg {
+	stroke: var(--subtheme);
+	fill: var(--subtheme);
+	stroke-width: 64px;
+}
+main > div.docs-explorer > div.header > div.header-right > button.explorer-file-download-only-docs > svg {
+	stroke: var(--subtheme);
+	stroke-width: 64px;
+}
+
 main > div.docs-explorer > div.explorer-path {
 	display: flex;
 	justify-content: flex-start;
@@ -206,6 +245,7 @@ main > div.docs-explorer > div.content > div.explorer-item {
 	align-items: center;
 }
 main > div.docs-explorer > div.content {
+	flex-grow: 1;
 	position: relative;
 	border-bottom: 2px solid rgba(var(--theme-font-rgb), 0.5);
 }
@@ -334,4 +374,116 @@ main > div.docs-explorer > div.content > div.loading-container > div.loading-con
 	100% {
 		transform: rotate(0deg);
 	}
+}
+
+/* Content contextmenu */
+dialog.context-menu {
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	border-radius: 5px;
+	border: 2px solid var(--subtheme);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+	z-index: 10000;
+	overflow: hidden;
+}
+dialog.context-menu > * {
+	flex-shrink: 0;
+}
+dialog.context-menu > div.context-menu-item {
+	height: 24px;
+	background-color: var(--theme);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	cursor: pointer;
+}
+dialog.context-menu > div.context-menu-item:hover {
+	background-color: rgba(var(--subtheme-rgb), 0.25);
+}
+dialog.context-menu > div.context-menu-item * {
+	pointer-events: none;
+}
+dialog.context-menu > div.context-menu-item > div.context-menu-item-left {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+dialog.context-menu > div.context-menu-item > div.context-menu-item-right {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+dialog.context-menu > div.context-menu-item > div.context-menu-item-left > *:not(:first-child),
+dialog.context-menu > div.context-menu-item > div.context-menu-item-right > *:not(:first-child) {
+	margin-left: 5px;
+}
+dialog.context-menu > div.context-menu-item > div.context-menu-item-left > .context-menu-item-logo {
+	width: 16px;
+	height: 16px;
+	margin: 4px;
+	stroke: var(--subtheme);
+	stroke-width: 64px;
+}
+dialog.context-menu > div.context-menu-item > div.context-menu-item-left > span.context-menu-item-text {
+	font-size: 14px;
+	padding-right: 10px;
+	font-weight: bolder;
+	color: var(--theme-font);
+}
+
+div.modalet-item-group {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+div.modalet-item-group:not(:first-child) {
+	margin-top: 5px;
+}
+
+button.template-toggle {
+	position: relative;
+	width: 30px;
+	height: 15px;
+	margin-left: 30px;
+	border: none;
+	outline: none;
+	background-color: var(--subtheme);
+	border-radius: 7.5px;
+	cursor: pointer;
+}
+button.template-toggle::before {
+	position: absolute;
+	top: 0;
+	display: block;
+	content: "";
+	width: 15px;
+	height: 15px;
+	border-radius: 7.5px;
+	border: 2.5px solid var(--subtheme);
+	background-color: var(--theme);
+	transition: left .25s cubic-bezier(.33, 1, .33, 1);
+}
+button.template-toggle[data-toggle="false"]::before {
+	left: 0;
+}
+button.template-toggle[data-toggle="true"]::before {
+	left: 15px;
+}
+button.template-toggle::after {
+	position: absolute;
+	display: block;
+	top: -1.5px;
+	left: 35px;
+	font-size: 12px;
+	font-weight: bolder;
+}
+button.template-toggle[data-toggle="false"]::after {
+	content: "Private";
+}
+button.template-toggle[data-toggle="true"]::after {
+	content: "Public";
 }

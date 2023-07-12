@@ -15,6 +15,10 @@ $(document).on('click', 'button.side-toggle', e => {
 		});
 });
 
+$(document).on('click', 'button.logout-button', e => {
+	location.href = getContext() + '/logout';
+});
+
 $(() => {
 	if (location.pathname == '/') {
 		$('span.doc-title').text('DashBoard');
