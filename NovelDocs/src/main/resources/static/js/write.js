@@ -19,12 +19,15 @@ $(document).on('click', 'button.editor-header-toggle', e => {
 
 $(document).on('input', 'textarea.content', e => {
 	let elem = $(e.target).closest('textarea.content');
-	$('span.text-count-indicator').text(`공백 포함: ${$(elem).val().length} 자`);
+	$('span.text-count-indicator-with-whitespace').text(`공백 포함: ${$(elem).val().length} 자`);
+	$('span.text-count-indicator-no-whitespace').text(`공백 제외: ${$('textarea.content').val().replace(/\s+/g, '').length} 자`);
 });
 
 $(() => {
 	// text count
-	$('footer').find('div.footer-right').append($('<span class="text-count-indicator"></span>'));
+	$('footer').find('div.footer-right').append($('<span class="text-count-indicator-with-whitespace"></span>'));
+	$('footer').find('div.footer-right').append($('<div style="width: 1px; margin-top: 2.5px; margin-bottom: 2.5px; border: 1px solid rgba(var(--subtheme-font-rgb), 0.5); align-self: stretch;"></div>'));
+	$('footer').find('div.footer-right').append($('<span class="text-count-indicator-no-whitespace"></span>'));
 	
 	let { fonts } = document;
 	const it = fonts.entries();
@@ -54,4 +57,6 @@ $(() => {
 		$(elem).val(value);
 		//console.log(value);
 	});
+	$('span.text-count-indicator-with-whitespace').text(`공백 포함: ${$('textarea.content').val().length} 자`);
+	$('span.text-count-indicator-no-whitespace').text(`공백 제외: ${$('textarea.content').val().replace(/\s+/g, '').length} 자`);
 });

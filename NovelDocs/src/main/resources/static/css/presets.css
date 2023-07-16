@@ -367,16 +367,16 @@ button > svg {
 	height: 100%;
 	pointer-events: none;
 }
-svg.fill-theme { fill: var(--theme); }
-svg.fill-theme-font { fill: var(--theme-font); }
-svg.fill-subtheme { fill: var(--subtheme); }
-svg.fill-subtheme-font { fill: var(--subtheme-font); }
-svg.fill-confirm { fill: var(--confirm); }
-svg.fill-warning { fill: var(--warning); }
+svg.fill-theme { fill: var(--theme) !important; }
+svg.fill-theme-font { fill: var(--theme-font) !important; }
+svg.fill-subtheme { fill: var(--subtheme) !important; }
+svg.fill-subtheme-font { fill: var(--subtheme-font) !important; }
+svg.fill-confirm { fill: var(--confirm) !important; }
+svg.fill-warning { fill: var(--warning) !important; }
 
-svg.stroke-theme { stroke: var(--theme-font); }
-svg.stroke-theme-font { stroke: var(--theme-font); }
-svg.stroke-subtheme { stroke: var(--subtheme); }
-svg.stroke-subtheme-font { stroke: var(--subtheme-font); }
-svg.stroke-confirm { stroke: var(--confirm); }
-svg.stroke-warning { stroke: var(--warning); }
+svg.stroke-theme { stroke: var(--theme-font) !important; }
+svg.stroke-theme-font { stroke: var(--theme-font) !important; }
+svg.stroke-subtheme { stroke: var(--subtheme) !important; }
+svg.stroke-subtheme-font { stroke: var(--subtheme-font) !important; }
+svg.stroke-confirm { stroke: var(--confirm) !important; }
+svg.stroke-warning { stroke: var(--warning) !important; }

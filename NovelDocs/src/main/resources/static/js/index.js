@@ -263,38 +263,38 @@ $(document).on('dblclick', 'div.explorer-item', e => {
 	}
 });
 
-const pathAnimation = () => {
-	$('div.recent-docs').find('div.recent-item-path > span').css('display', '');
-	$('div.recent-docs').find('div.recent-item-path > span').css('left', '0');
-	$('div.recent-docs').find('div.recent-item-path > span').stop();
-	$('div.recent-docs').find('div.recent-item-path > span').each((index, item) => {
-		let elem = $(item);
-		let parent = $(elem).closest('div.recent-item-path');
-		let framerate = 12;
-		
-		let duration = 0;
-		let getWidth = element => parseFloat($(element).css('width').replace('px', ''));
-		
-		if (getWidth(elem) > getWidth(parent)) {
-			let diff = getWidth(elem) - getWidth(parent);
-			duration = diff / 0.02;
-			$(elem).css({
-				'width': $(elem).css('width'),
-				'display': 'block',
-				'left': '0'
+const pathAnimation = target => {
+	$(target).css('display', '');
+	$(target).css('left', '0');
+	$(target).stop();
+	let elem = $(target);
+	let parent = $(elem).closest('div.recent-item-path');
+	let framerate = 12;
+	
+	let duration = 0;
+	let getWidth = element => parseFloat($(element).css('width').replace('px', ''));
+	
+	if (getWidth(elem) > getWidth(parent)) {
+		let diff = getWidth(elem) - getWidth(parent);
+		duration = diff / 0.02;
+		$(elem).css({
+			'width': $(elem).css('width'),
+			'display': 'block',
+			'left': '0'
+		});
+		const slide = (element, diff) => {
+			$(element).animate({ 'left': `-${diff}px` }, duration, 'linear', () => {
+				setTimeout(() => pathAnimation(target), 2000);
 			});
-			const slide = (element, diff) => {
-				$(element).animate({ 'left': `-${diff}px` }, duration, 'linear', () => {
-					setTimeout(() => pathAnimation(), 2000);
-				});
-			};
-			setTimeout(() => slide(elem, diff), 1000);
-		}
-	});
+		};
+		setTimeout(() => slide(elem, diff), 1000);
+	}
 };
 
 $(document).on('resize', 'div.recent-item', e => {
-	pathAnimation();
+	$('div.recent-docs > div.content > div.recent-item > div.recent-item-path > span').each((index, item) => {
+		pathAnimation($(item));
+	});
 });
 
 $(document).on('dblclick', 'div.recent-item', e => {
@@ -436,9 +436,68 @@ $(document).on('contextmenu', 'div.docs-explorer > div.content', e => {
 		},
 		//'separator'
 	];
+	if ($(e.target).attr('class') == 'explorer-item') {
+		if ($(e.target).attr('data-selected') == 'false') {
+			$('div.explorer-item').not(e.target).attr('data-selected', 'false');
+			$(e.target).attr('data-selected', 'true');
+		}
+		let itemContexts = [
+			'separator',
+			{
+				role: 'download',
+				text: '다운로드',
+				d: 'M 256 480 L 64 304 H 192 V 128 H 352 V 304 H 448 Z M 192 32 H 352',
+				svgClasses: [ 'stroke-confirm', 'fill-confirm' ],
+				action: () => {
+					let items = $('div.explorer-item[data-selected="true"]').toArray().map(item => { return { 'type': $(item).attr('data-type'), 'name': $(item).attr('data-name') }; });
+					let path = proxy.explorePath;
+					let sendData = { path: path, items: items };
+					$.ajax({
+						url: getContext() + '/ajax/downloadSelection',
+						type: 'post',
+						data: JSON.stringify(sendData),
+						dataType: 'json',
+						contentType: 'application/json',
+						success: data => {
+							if (data.result != 1) {
+								Poplet.pop('다운로드에 실패했습니다', Poplet.PopType.INVALID);
+								return;
+							}
+							Poplet.pop('다운로드를 시작합니다');
+							const link = document.createElement('a');
+							link.href = 'data:text/plain;base64,' + data.data;
+							link.download = data.filename;
+							link.click();
+						}
+					});
+				}
+			},
+			'separator',
+			{
+				role: 'rename',
+				text: '이름 바꾸기',
+				d: 'M 32 288 L 224 480 480 224 V 32 H 288 Z M 352 128 A 32 32 0 0 0 352 192 A 32 32 0 0 0 352 128 Z',
+				svgClasses: [ 'stroke-theme-font' ],
+				action: () => {
+					
+				}
+			},
+			{
+				role: 'delete',
+				text: '삭제',
+				d: 'M 256 192 L 96 32 32 96 192 256 32 416 96 480 256 320 416 480 480 416 320 256 480 96 416 32 Z',
+				svgClasses: [ 'stroke-warning', 'fill-warning' ],
+				action: () => {
+					
+				}
+			},
+		];
+		//contexts = contexts.concat(...itemContexts);
+		for (let ct of itemContexts) contexts.push(ct);
+	}
 	for (let ct of contexts) {
 		if (ct === 'separator') {
-			let hr = $('<hr style="width: 90%;"/>');
+			let hr = $('<hr style="width: 90%; background-color: var(--subtheme); margin: 2.5px auto;"/>');
 			$(contextMenu).append($(hr));
 			continue;
 		}
@@ -478,5 +537,7 @@ $(document).on('contextmenu', 'div.docs-explorer > div.content', e => {
 });
 
 $(() => {
-	pathAnimation();
+	$('div.recent-docs > div.content > div.recent-item > div.recent-item-path > span').each((index, item) => {
+		pathAnimation($(item));
+	});
 });

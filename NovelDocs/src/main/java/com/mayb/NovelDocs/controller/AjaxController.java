@@ -10,12 +10,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -256,7 +259,6 @@ public class AjaxController {
 			result.put("result", 1);
 			return result;
 		} catch (IOException e) {
-			e.printStackTrace();
 			result.put("result", 0);
 			return result;
 		} finally {
@@ -267,5 +269,124 @@ public class AjaxController {
 				Files.deleteIfExists(Paths.get(request.getServletContext().getRealPath("/workbench/") + rootDir + ".zip"));
 			} catch (IOException e) { e.printStackTrace(); }
 		}
+	}
+	@ResponseBody
+	@PostMapping(value = "/downloadSelection")
+	public Map<String, Object> downloadSelection(@AuthenticationPrincipal UserDetailsImpl userDetails,
+																HttpServletRequest request, HttpServletResponse response,
+																@RequestBody Map<String, Object> data) {
+		Map<String, Object> result = new HashMap<>();
+		
+		String path = (String)data.get("path");
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+		String workFolderName = String.format("%s_%s_%s", userDetails.getUser().getNickname(), "download", sdf.format(new Date()));
+		File workDir = new File(request.getServletContext().getRealPath("/workbench") + File.separator + workFolderName);
+		if (!workDir.exists()) workDir.mkdirs();
+		@SuppressWarnings("unchecked")
+		List<LinkedHashMap<String, Object>> itemsData = (ArrayList<LinkedHashMap<String, Object>>)data.get("items");
+		if (itemsData.size() == 1 && itemsData.get(0).get("type").equals("file")) {
+			// 텍스트 파일로 내보내기
+			try {
+				String type = (String)itemsData.get(0).get("type");
+				String name = (String)itemsData.get(0).get("name");
+				Docs searcher = new Docs();
+				searcher.setTitle(name);
+				searcher.setVirtual_dir(path);
+				searcher.setReguser(userDetails.getUser());
+				Docs doc = docsService.getDocByPath(searcher);
+				Files.writeString(Paths.get(workDir.getAbsolutePath() + File.separator + name + ".txt"), doc.getContent() == null ? "" : doc.getContent(), StandardCharsets.UTF_8);
+				byte[] fileData = Files.readAllBytes(Paths.get(workDir.getAbsolutePath() + File.separator + name + ".txt"));
+				result.put("data", new String(Base64.encodeBase64(fileData)));
+				result.put("filename", name + ".txt");
+				result.put("result", 1);
+			} catch (IOException e) {
+				result.put("result", 0);
+			} finally {
+				try {
+					if (Files.exists(Paths.get(workDir.getAbsolutePath()))) {
+						Files.walk(workDir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+					} else Files.deleteIfExists(Paths.get(workDir.getAbsolutePath()));
+				}
+				catch (Exception e) { e.printStackTrace(); }
+			}
+		} else {
+			for (LinkedHashMap<String, Object> item : itemsData) {
+				String type = (String)item.get("type");
+				String name = (String)item.get("name");
+				switch (type) {
+					case "folder":
+						Directory searcher = new Directory();
+						searcher.setName(name);
+						searcher.setParent((path.equals("/") ? "" : path) + "/" + name);
+						searcher.setReguser(userDetails.getUser().getId());
+						List<Directory> dirList = directoryService.getConnectedDirectories(searcher);
+						File currentFolder = new File(workDir.getAbsolutePath() + File.separator + name);
+						if (!currentFolder.exists()) currentFolder.mkdir();
+						Docs searchDoc = new Docs();
+						searchDoc.setVirtual_dir((searcher.getParent().equals("/") ? "" : searcher.getParent()));
+						searchDoc.setReguser(userDetails.getUser());
+						List<Docs> initialDocs = docsService.getDocs(searchDoc);
+						for (Docs doc : initialDocs) {
+							String filePath = currentFolder.getAbsolutePath() + File.separator + doc.getTitle() + ".txt";
+							try { Files.writeString(Paths.get(filePath), doc.getContent() == null ? "" : doc.getContent(), StandardCharsets.UTF_8); }
+							catch (IOException e) {  }
+						}
+						for (Directory dir : dirList) {
+							String currentPath = dir.getParent() + "/" + dir.getName();
+							String relativePath = "/" + currentPath.substring(path.length());
+							File folder = new File((workDir.getAbsolutePath() + relativePath).replace("/", File.separator));
+							if (!folder.exists()) folder.mkdir();
+							Docs searcherSubDoc = new Docs();
+							searcherSubDoc.setVirtual_dir(currentPath);
+							searcherSubDoc.setReguser(userDetails.getUser());
+							List<Docs> subdirDocs = docsService.getDocs(searcherSubDoc);
+							for (Docs doc : subdirDocs) {
+								String filePath = folder.toPath().toAbsolutePath() + File.separator + doc.getTitle() + ".txt";
+								try { Files.writeString(Paths.get(filePath), doc.getContent() == null ? "" : doc.getContent(), StandardCharsets.UTF_8); }
+								catch (IOException e) {  }
+							}
+						}
+						break;
+					case "file":
+						Docs searcherDoc = new Docs();
+						searcherDoc.setTitle(name);
+						searcherDoc.setVirtual_dir(path);
+						searcherDoc.setReguser(userDetails.getUser());
+						Docs doc = docsService.getDocByPath(searcherDoc);
+						try { Files.writeString(Paths.get(workDir.getAbsolutePath() + File.separator + name + ".txt"), doc.getContent() == null ? "" : doc.getContent(), StandardCharsets.UTF_8); }
+						catch (IOException e) {  }
+						break;
+					default: break;
+				}
+			}
+			try {
+				// Zip file로 만들어서 byte[]로 변환 후, base64 Encoding
+				String source = workDir.getAbsolutePath();
+				FileOutputStream fos = new FileOutputStream(workDir.getAbsolutePath() + ".zip");
+				ZipOutputStream zipOut = new ZipOutputStream(fos, StandardCharsets.UTF_8);
+				File file = new File(source);
+				compress(file, file.getName(), zipOut);
+				zipOut.close();
+				fos.close();
+				// Zip file Download
+				byte[] fileByte = Files.readAllBytes(Paths.get(workDir.getAbsolutePath() + ".zip"));
+				result.put("data", new String(Base64.encodeBase64(fileByte)));
+				result.put("filename", workFolderName + ".zip");
+				result.put("result", 1);
+			} catch (Exception e) {
+				result.put("result", 0);
+			} finally {
+				try {
+					if (Files.exists(Paths.get(workDir.getAbsolutePath()))) {
+						Files.walk(workDir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+					} else Files.deleteIfExists(Paths.get(workDir.getAbsolutePath()));
+					Files.deleteIfExists(Paths.get(workDir.getAbsolutePath() + ".zip"));
+				}
+				catch (Exception e) { e.printStackTrace(); }
+			}
+		}
+		
+		return result;
 	}
 }

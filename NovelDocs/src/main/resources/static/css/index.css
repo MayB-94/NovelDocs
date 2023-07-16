@@ -16,6 +16,7 @@ main > div.recent-docs {
 	
 }
 main > div.recent-docs > div.content {
+	margin-top: 5px;
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;

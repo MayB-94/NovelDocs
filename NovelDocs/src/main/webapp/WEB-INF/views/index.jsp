@@ -28,7 +28,7 @@
 			<span class="header-title">탐색</span>
 		</div>
 		<div class="header-right">
-			<span style="font-size: 14px; font-weight: bolder; color: var(--subtheme);">다운로드</span>
+			<!-- <span style="font-size: 14px; font-weight: bolder; color: var(--subtheme);">다운로드</span> -->
 			<button type="button" class="explorer-manipulate explorer-file-download-all">
 				<svg>
 					<path d="M 256 480 L 64 304 H 192 V 128 H 352 V 304 H 448 Z M 192 32 H 352"/>
