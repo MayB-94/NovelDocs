@@ -2,6 +2,135 @@
  * 
  */
 
+var currentText = '';
+const state = {
+	status: '준비',
+	textChanged: false
+};
+const stateProxy = new Proxy(state, {
+	set(target, prop, value, receiver) {
+		if (prop == 'status') {
+			$('footer').find('div.footer-left').find('span.state-indicator').text(value);
+		} else if (prop == 'textChanged') {
+			if (value) {
+				$('header > div.header-left').append($('<span class="textchange-indicator">*</span>'));
+			} else {
+				$('header > div.header-left > span.textchange-indicator').remove();
+			}
+		}
+		state[prop] = value;
+	}
+});
+
+const getCaretPosition = textarea => {
+	let start = textarea.selectionStart;
+	let end = textarea.selectionEnd;
+	
+	const createCopy = el => {
+		let copy = document.createElement('div');
+		copy.textContent = el.value;
+		const style = getComputedStyle(el);
+		[
+			'fontFamily',
+			'fontSize',
+			'fontWeight',
+			'wordWrap', 
+			'whiteSpace',
+			'borderLeftWidth',
+			'borderTopWidth',
+			'borderRightWidth',
+			'borderBottomWidth',
+			'padding',
+		].forEach(key => copy.style[key] = style[key]);
+		copy.style.overflow = 'auto';
+		copy.style.width = el.offsetWidth + 'px';
+		copy.style.height = el.offsetHeight + 'px';
+		copy.style.position = 'absolute';
+		copy.style.left = el.offsetLeft + 'px';
+		copy.style.top = el.offsetTop + 'px';
+		document.body.appendChild(copy);
+		return copy;
+	};
+	let copy = createCopy(textarea);
+	let range = document.createRange();
+	range.setStart(copy.firstChild, start);
+	range.setEnd(copy.firstChild, end);
+	let rect = range.getBoundingClientRect();
+	$(copy).remove();
+	return {
+		x: rect.left - textarea.scrollLeft,
+		y: rect.top - textarea.scrollTop,
+		width: rect.width,
+		height: rect.height
+	};
+};
+
+const save = () => {
+	if (currentText == $('textarea.content').val()) return;
+	stateProxy.status = "저장 중 입니다";
+	let paths = decodeURI(location.pathname).split(/\//);
+	let id = paths[paths.length - 2];
+	let docNum = parseInt(paths[paths.length - 1]);
+	console.log(id);
+	console.log(docNum);
+	let dataObj = {
+		id: id,
+		docNum: docNum,
+		content: $('textarea.content').val()
+	};
+	$.ajax({
+		url: getContext() + '/ajax/saveDocument',
+		data: JSON.stringify(dataObj),
+		type: 'post',
+		dataType: 'json',
+		contentType: 'application/json',
+		success: data => {
+			
+			stateProxy.status = "저장했습니다";
+			currentText = $('textarea.content').val();
+		}
+	});
+};
+
+$(document).on('keydown', 'textarea.content', e => {
+	let elem = $(e.target).closest('textarea.content');
+	let position = getCaretPosition($(elem)[0]);
+	$('div.word-suggestion').css({
+		left: position.x,
+		top: position.y + position.height
+	});
+	/*
+	let selection = window.getSelection();
+	selection?.modify('move', 'forward', 'word');
+	selection?.modify('extend', 'backward', 'word');
+	const text = selection.toString();
+	console.log(text);
+	// 현재 커서의 단어를 추출...
+	// 문제는 커서 이동이 안됨
+	*/
+	let start = $(elem)[0].selectionStart;
+	let end = $(elem)[0].selectionEnd;
+	if (start == end) {
+		let fullText = $(elem).val();
+		let stopCharacters = [ ' ', '\n', '\r', '\t' ];
+		while (start > 0) {
+			if (stopCharacters.indexOf(fullText[start]) == -1) --start;
+			else break;
+		}
+		while (end < fullText.length) {
+			if (stopCharacters.indexOf(fullText[end]) == -1) ++end;
+			else break;
+		}
+		let word = fullText.substr(start, end - start);
+		console.log(word);
+	}
+});
+
+$(document).on('mousedown', 'div.word-suggestion', e => {
+	e.preventDefault();
+});
+
+
 $(document).on('change', 'select.editor-header-select', e => {
 	let elem = $(e.target).closest('select.editor-header-select');
 	let prop = $(elem).attr('role');
@@ -19,11 +148,15 @@ $(document).on('click', 'button.editor-header-toggle', e => {
 
 $(document).on('input', 'textarea.content', e => {
 	let elem = $(e.target).closest('textarea.content');
+	if (!stateProxy.textChanged && currentText != $('textarea.content').val()) stateProxy.textChanged = true;
 	$('span.text-count-indicator-with-whitespace').text(`공백 포함: ${$(elem).val().length} 자`);
 	$('span.text-count-indicator-no-whitespace').text(`공백 제외: ${$('textarea.content').val().replace(/\s+/g, '').length} 자`);
 });
 
 $(() => {
+	currentText = $('textarea.content').val();
+	// state indicator
+	$('footer').find('div.footer-left').append($('<span class="state-indicator"></span>'));
 	// text count
 	$('footer').find('div.footer-right').append($('<span class="text-count-indicator-with-whitespace"></span>'));
 	$('footer').find('div.footer-right').append($('<div style="width: 1px; margin-top: 2.5px; margin-bottom: 2.5px; border: 1px solid rgba(var(--subtheme-font-rgb), 0.5); align-self: stretch;"></div>'));
@@ -59,4 +192,5 @@ $(() => {
 	});
 	$('span.text-count-indicator-with-whitespace').text(`공백 포함: ${$('textarea.content').val().length} 자`);
 	$('span.text-count-indicator-no-whitespace').text(`공백 제외: ${$('textarea.content').val().replace(/\s+/g, '').length} 자`);
+	setTimeout(() => setInterval(save(), 300000), 300000);
 });

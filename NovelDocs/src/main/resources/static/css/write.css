@@ -98,6 +98,15 @@ main > div.docs-editor > textarea.content {
 	background-color: var(--theme);
 	color: var(--theme-font);
 }
+main > div.docs-editor > div.word-suggestion {
+	position: absolute;
+	display: none;
+	width: 20px;
+	height: 1.2em;
+	border: 1px solid var(--subtheme);
+	border-radius: 1.25px;
+	background: var(--theme);
+}
 
 footer {
 	display: flex;

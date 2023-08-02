@@ -12,4 +12,5 @@ public class Updatefile {
 	private User updateuser;
 	@JsonFormat(timezone = "Asia/Seoul")
 	private Date updatedate;
+	private String prevcontent;
 }

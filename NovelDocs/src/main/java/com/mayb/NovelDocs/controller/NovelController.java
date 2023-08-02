@@ -26,10 +26,10 @@ public class NovelController {
 	private final UserService userService;
 	
 	@GetMapping(value = "/{writer}/{docs_id}")
-	public String write(@AuthenticationPrincipal UserDetailsImpl userDetails,
-							@PathVariable String writer, @PathVariable Integer docs_id,
-							Model model) {
-		User user = userService.getUserByNickname(writer);
+	public String viewDocument(@AuthenticationPrincipal UserDetailsImpl userDetails,
+										@PathVariable String writer, @PathVariable Integer docs_id,
+										Model model) {
+		User user = userService.getUserByUsername(writer);
 		Docs searcher = new Docs();
 		searcher.setDocs_id(docs_id);
 		searcher.setReguser(user);

@@ -32,5 +32,6 @@
 		</div>
 		<!-- <button type="button" onclick="Modalet.show({ content: '모달 테스트' })">모달 TEST</button> -->
 	</div>
-	<textarea class="content" style="font-size: 14px;">${doc.content }</textarea>
+	<textarea class="content" style="font-size: 14px;" spellcheck="false">${doc.content }</textarea>
+	<div class="word-suggestion"></div>
 </div>

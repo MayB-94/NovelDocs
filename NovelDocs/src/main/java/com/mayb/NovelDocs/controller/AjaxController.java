@@ -88,7 +88,7 @@ public class AjaxController {
 		Docs doc = docsService.getDocByPath(searcher);
 		if (doc != null) {
 			result.put("docs_id", doc.getDocs_id());
-			result.put("writer", doc.getReguser().getNickname());
+			result.put("writer", doc.getReguser().getId());
 		}
 		return result;
 	}
@@ -386,6 +386,20 @@ public class AjaxController {
 				catch (Exception e) { e.printStackTrace(); }
 			}
 		}
+		
+		return result;
+	}
+	
+	@ResponseBody
+	@PostMapping(value = "/saveDocument")
+	public Map<String, Object> saveDocument(@AuthenticationPrincipal UserDetailsImpl userDetails,
+														   @RequestBody Map<String, Object> data) {
+		Map<String, Object> result = new HashMap<>();
+		String id = (String)data.get("id");
+		Integer docNum = (Integer)data.get("docNum");
+		String content = (String)data.get("content");
+		
+		
 		
 		return result;
 	}
