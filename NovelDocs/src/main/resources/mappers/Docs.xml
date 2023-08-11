@@ -37,4 +37,12 @@
 		VALUES ((SELECT NVL(MAX(DOCS_ID), 0) + 1 DOCS_ID FROM DOCS WHERE REGUSER = #{reguser.id}),
 				   #{title}, #{virtual_dir}, #{reguser.id}, #{exposetype})
 	</insert>
+	<select id="changeTitle" statementType="CALLABLE" parameterType="HashMap">
+		{
+			CALL CHANGE_TITLE (
+				#{user, mode=IN}, #{currentTitle, mode=IN}, #{title, mode=IN}, #{directory, mode=IN}, #{type, mode=IN},
+				#{result, mode=OUT, jdbcType=NUMERIC}
+			)
+		}
+	</select>
 </mapper>

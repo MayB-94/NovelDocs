@@ -2,5 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.mayb.NovelDocs.model.UpdatefileMapper">
-	
+	<select id="saveDoc" statementType="CALLABLE" parameterType="HashMap">
+		{
+			CALL UPDATE_DOC (
+				#{user, mode=IN}, #{docs_id, mode=IN}, #{content, mode=IN, jdbcType=VARCHAR},
+				#{result, mode=OUT, jdbcType=NUMERIC}, #{updateDate, mode=OUT, jdbcType=TIMESTAMP}
+			)
+		}
+	</select>
 </mapper>

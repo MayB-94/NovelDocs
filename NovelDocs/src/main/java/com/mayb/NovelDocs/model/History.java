@@ -8,7 +8,8 @@ import lombok.Data;
 
 @Data
 public class History {
-	private Docs docs;
+	private Integer id_num;
+	private String type;
 	private String prev_title;
 	private String curr_title;
 	@JsonFormat(timezone = "Asia/Seoul")

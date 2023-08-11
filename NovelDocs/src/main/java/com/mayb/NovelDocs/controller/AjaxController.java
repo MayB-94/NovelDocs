@@ -46,6 +46,7 @@ import com.mayb.NovelDocs.model.User;
 import com.mayb.NovelDocs.security.UserDetailsImpl;
 import com.mayb.NovelDocs.service.DirectoryService;
 import com.mayb.NovelDocs.service.DocsService;
+import com.mayb.NovelDocs.service.UpdatefileService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,6 +56,7 @@ import lombok.RequiredArgsConstructor;
 public class AjaxController {
 	private final DirectoryService directoryService;
 	private final DocsService docsService;
+	private final UpdatefileService updatefileService;
 	
 	@ResponseBody
 	@PostMapping(value = "/getDirectoryInfo")
@@ -396,11 +398,41 @@ public class AjaxController {
 														   @RequestBody Map<String, Object> data) {
 		Map<String, Object> result = new HashMap<>();
 		String id = (String)data.get("id");
-		Integer docNum = (Integer)data.get("docNum");
+		Integer docs_id = (Integer)data.get("docs_id");
 		String content = (String)data.get("content");
 		
+		Map<String, Object> param = new HashMap<>();
+		Integer procResult = 0;
+		Date updateDate = new Date();
+		param.put("user", id);
+		param.put("docs_id", docs_id);
+		param.put("content", content);
+		param.put("result", procResult);
+		param.put("updateDate", updateDate);
+		updatefileService.updateDocs(param);
 		
+		result.put("result", param.get("result"));
+		result.put("updateDate", param.get("updateDate"));
+		return result;
+	}
+	
+	@ResponseBody
+	@PostMapping(value = "/changeTitle")
+	public Map<String, Object> changeTitle(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody Map<String, Object> data) {
+		Map<String, Object> result = new HashMap<>();
+
+		/*String title = (String)data.get("title");
+		String currentTitle = (String)data.get("currentTitle");
+		String directory = (String)data.get("directory");
+		String type = (String)data.get("type");*/
+		Map<String, Object> param = new HashMap<>();
+		param.put("user", userDetails.getUser().getId());
+		param.putAll(data);
+		Integer resultInt = 0;
+		param.put("result", resultInt);
+		docsService.updateTitle(param);
 		
+		result.put("result", param.get("result"));
 		return result;
 	}
 }

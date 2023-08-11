@@ -44,4 +44,8 @@ public class NovelController {
 		model.addAttribute("doc", docs);
 		return "write.layout";
 	}
+	@GetMapping(value = "/guest")
+	public String writeNewDoc(Model model) {
+		return "write.layout";
+	}
 }

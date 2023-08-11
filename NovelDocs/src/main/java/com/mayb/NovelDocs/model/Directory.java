@@ -8,6 +8,7 @@ import lombok.Data;
 
 @Data
 public class Directory {
+	private Integer dir_id;
 	private String name;
 	private String parent;
 	private String reguser;

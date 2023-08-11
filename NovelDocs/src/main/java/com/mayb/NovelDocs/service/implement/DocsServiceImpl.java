@@ -1,6 +1,7 @@
 package com.mayb.NovelDocs.service.implement;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -30,5 +31,9 @@ public class DocsServiceImpl implements DocsService {
 	@Override
 	public Integer createDoc(Docs doc) {
 		return docsDao.createDoc(doc);
+	}
+	@Override
+	public void updateTitle(Map<String, Object> param) {
+		docsDao.updateTitle(param);
 	}
 }

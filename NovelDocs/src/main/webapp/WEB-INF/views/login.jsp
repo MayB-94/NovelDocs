@@ -39,7 +39,7 @@
 				<button type="submit" role="login">
 					<span>로그인</span>
 				</button>
-				<button type="button" role="guest">
+				<button type="button" role="guest" onclick="location.href = getContext() + '/docs/guest'">
 					<span>게스트 로그인</span>
 				</button>
 			</div>

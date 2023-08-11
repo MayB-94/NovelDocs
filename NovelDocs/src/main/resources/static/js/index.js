@@ -478,8 +478,46 @@ $(document).on('contextmenu', 'div.docs-explorer > div.content', e => {
 				text: '이름 바꾸기',
 				d: 'M 32 288 L 224 480 480 224 V 32 H 288 Z M 352 128 A 32 32 0 0 0 352 192 A 32 32 0 0 0 352 128 Z',
 				svgClasses: [ 'stroke-theme-font' ],
+				condition: () => $('div.explorer-item[data-selected="true"]').length == 1,
 				action: () => {
-					
+					Modalet.show({
+						title: '<h3 class="margin-0">이름 바꾸기</h3>',
+						content: '<div class="display-flex flex-direction-column justify-content-flex-start align-items-stretch">' +
+									'<div class="font-weight-bolder modalet-item-group">' +
+									'<label class="margin-right-5px" for="name-for-change">이름</label>' +
+							   		'<input id="name-for-change" name="name-for-change" value="' + $('div.explorer-item[data-selected="true"]').attr('data-name') + '" placeholder="변경할 이름">' +
+									'</div>' + 
+									'</div>',
+						type: Modalet.ModalType.OKCANCEL,
+						OK: () => {
+							let modalResponse = true;
+							let changingName = $('div.modalet-modal').find('input#name-for-change').val();
+							let dataObj = {
+								title: changingName,
+								currentTitle: $('div.explorer-item[data-selected="true"]').attr('data-name'),
+								directory: proxy.explorePath,
+								type: $('div.explorer-item[data-selected="true"]').attr('data-type')
+							};
+							$.ajax({
+								url: getContext() + '/ajax/changeTitle',
+								type: 'post',
+								data: JSON.stringify(dataObj),
+								dataType: 'json',
+								contentType: 'application/json',
+								async: false,
+								success: data => {
+									if (data.result != 1) {
+										modalResponse = null;
+										Poplet.pop(data.result == 0 ? '중복된 이름입니다' : '오류가 발생했습니다', Poplet.PopType.INVALID);
+									} else {
+										proxy.explorePath = proxy.explorePath;
+										Poplet.pop('성공적으로 변경되었습니다', Poplet.PopType.VALID);
+									} 
+								}
+							});
+							return modalResponse;
+						}
+					});
 				}
 			},
 			{
@@ -501,9 +539,8 @@ $(document).on('contextmenu', 'div.docs-explorer > div.content', e => {
 			$(contextMenu).append($(hr));
 			continue;
 		}
-		if (typeof ct.condition !== 'undefined') {
-			if (!ct.condition) continue;
-		}
+		if (typeof ct.condition == 'boolean' && !ct.condition) continue;
+		else if (typeof ct.condition == 'function' && !ct.condition()) continue;
 		let contextItem = $('<div class="context-menu-item"></div>');
 		let contextLeft = $('<div class="context-menu-item-left"></div>');
 		let contextRight = $('<div class="context-menu-item-right"></div>');

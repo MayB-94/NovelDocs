@@ -40,8 +40,10 @@ public class SpringSecurityConfig {
 			 // 인증 허용 범위 설정
 			 .authorizeHttpRequests()
 			 	.antMatchers("/images/**").permitAll() // static resources 인증 제외
-			 	.antMatchers("/login", "/not-authorized").permitAll()
+			 	.antMatchers("/login").permitAll()
+			 	.antMatchers("/not-authorized").permitAll()
 			 	.antMatchers("/").authenticated()
+			 	.antMatchers("/docs/guest").permitAll()
 			 	.antMatchers("/novel/**").authenticated()
 			 	.anyRequest().permitAll()
 			 .and()

@@ -12,10 +12,19 @@ const stateProxy = new Proxy(state, {
 		if (prop == 'status') {
 			$('footer').find('div.footer-left').find('span.state-indicator').text(value);
 		} else if (prop == 'textChanged') {
-			if (value) {
+			if (!state[prop] && value) {
 				$('header > div.header-left').append($('<span class="textchange-indicator">*</span>'));
-			} else {
+				$(window).on('beforeunload', e => {
+					if (stateProxy.textChanged == true) {
+						return '변경사항이 저장되지 않았습니다.\n종료하시겠습니까?';
+					} else {
+						return true;
+					}
+				});
+			}
+			else if (state[prop] && !value) {
 				$('header > div.header-left > span.textchange-indicator').remove();
+				$(window).off('beforeunload');
 			}
 		}
 		state[prop] = value;
@@ -53,8 +62,10 @@ const getCaretPosition = textarea => {
 	};
 	let copy = createCopy(textarea);
 	let range = document.createRange();
-	range.setStart(copy.firstChild, start);
-	range.setEnd(copy.firstChild, end);
+	if (copy.firstChild != null) {
+		range.setStart(copy.firstChild, start);
+		range.setEnd(copy.firstChild, end);
+	}
 	let rect = range.getBoundingClientRect();
 	$(copy).remove();
 	return {
@@ -67,15 +78,13 @@ const getCaretPosition = textarea => {
 
 const save = () => {
 	if (currentText == $('textarea.content').val()) return;
-	stateProxy.status = "저장 중 입니다";
+	stateProxy.status = '저장 중 입니다';
 	let paths = decodeURI(location.pathname).split(/\//);
 	let id = paths[paths.length - 2];
-	let docNum = parseInt(paths[paths.length - 1]);
-	console.log(id);
-	console.log(docNum);
+	let docs_id = parseInt(paths[paths.length - 1]);
 	let dataObj = {
 		id: id,
-		docNum: docNum,
+		docs_id: docs_id,
 		content: $('textarea.content').val()
 	};
 	$.ajax({
@@ -85,9 +94,15 @@ const save = () => {
 		dataType: 'json',
 		contentType: 'application/json',
 		success: data => {
-			
-			stateProxy.status = "저장했습니다";
-			currentText = $('textarea.content').val();
+			if (data.result == 1) {
+				let dt = dateToObject(new Date(data.updateDate));
+				stateProxy.status = '저장했습니다 ({0}-{1}-{2} {3}:{4})'.format(dt.year % 100, dt.month, dt.day, dt.hour, dt.minute);
+				currentText = $('textarea.content').val();
+				stateProxy.textChanged = false;
+			} else {
+				stateProxy.status = '';
+				Poplet.pop('저장에 실패했습니다', Poplet.PopType.INVALID);
+			}
 		}
 	});
 };
@@ -192,5 +207,7 @@ $(() => {
 	});
 	$('span.text-count-indicator-with-whitespace').text(`공백 포함: ${$('textarea.content').val().length} 자`);
 	$('span.text-count-indicator-no-whitespace').text(`공백 제외: ${$('textarea.content').val().replace(/\s+/g, '').length} 자`);
-	setTimeout(() => setInterval(save(), 300000), 300000);
+	if (location.pathname != '/docs/guest') {
+		setInterval(save, 60000);
+	}
 });
